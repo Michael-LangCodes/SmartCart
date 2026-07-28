@@ -9,6 +9,7 @@ import {
   Library,
   Users,
   LogOut,
+  LogIn,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setActiveKitchen } from "@/app/(app)/actions";
@@ -27,10 +28,12 @@ export function Nav({
   kitchens,
   activeKitchenId,
   userName,
+  isGuest = false,
 }: {
   kitchens: Kitchen[];
   activeKitchenId: string | null;
   userName: string;
+  isGuest?: boolean;
 }) {
   const pathname = usePathname();
 
@@ -88,18 +91,35 @@ export function Nav({
           )}
 
           <span className="hidden text-sm text-zinc-500 md:inline dark:text-zinc-400">
-            {userName}
+            {isGuest ? (
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                Guest
+              </span>
+            ) : (
+              userName
+            )}
           </span>
 
-          <form action={signOut}>
-            <button
-              type="submit"
-              title="Sign out"
-              className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+          {isGuest ? (
+            <Link
+              href="/login"
+              title="Sign in or create an account"
+              className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950"
             >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </form>
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign in</span>
+            </Link>
+          ) : (
+            <form action={signOut}>
+              <button
+                type="submit"
+                title="Sign out"
+                className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </header>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ShoppingCart, CalendarDays, BookOpen, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { REQUIRE_AUTH } from "@/lib/auth-config";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -50,8 +51,10 @@ export default async function Home() {
               Sign in
             </Button>
           </Link>
-          <Link href="/signup">
-            <Button size="sm">Get started</Button>
+          <Link href={REQUIRE_AUTH ? "/signup" : "/planner"}>
+            <Button size="sm">
+              {REQUIRE_AUTH ? "Get started" : "Open the app"}
+            </Button>
           </Link>
         </div>
       </header>
@@ -68,14 +71,29 @@ export default async function Home() {
           you can share with your whole kitchen.
         </p>
         <div className="mt-8 flex gap-3">
-          <Link href="/signup">
-            <Button size="md">Create free account</Button>
-          </Link>
-          <Link href="/login">
-            <Button size="md" variant="outline">
-              Sign in
-            </Button>
-          </Link>
+          {REQUIRE_AUTH ? (
+            <>
+              <Link href="/signup">
+                <Button size="md">Create free account</Button>
+              </Link>
+              <Link href="/login">
+                <Button size="md" variant="outline">
+                  Sign in
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/planner">
+                <Button size="md">Open the app</Button>
+              </Link>
+              <Link href="/login">
+                <Button size="md" variant="outline">
+                  Sign in
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="mt-16 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

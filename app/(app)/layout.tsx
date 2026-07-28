@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMyKitchens, getActiveKitchen } from "@/lib/kitchen";
+import { REQUIRE_AUTH } from "@/lib/auth-config";
 import { Nav } from "@/components/nav";
 
 export default async function AppLayout({
@@ -13,7 +14,11 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  // In open mode the proxy establishes a guest session; this is a fallback in
+  // case it didn't (e.g. first hit that bypassed the proxy).
+  if (!user) redirect(REQUIRE_AUTH ? "/login" : "/auth/guest?next=/planner");
+
+  const isGuest = user.is_anonymous ?? false;
 
   const kitchens = await getMyKitchens();
   const activeKitchen = await getActiveKitchen(kitchens);
@@ -24,8 +29,9 @@ export default async function AppLayout({
     .eq("id", user.id)
     .maybeSingle();
 
-  const userName =
-    profile?.display_name ?? user.email?.split("@")[0] ?? "Account";
+  const userName = isGuest
+    ? "Guest"
+    : (profile?.display_name ?? user.email?.split("@")[0] ?? "Account");
 
   return (
     <>
@@ -33,6 +39,7 @@ export default async function AppLayout({
         kitchens={kitchens}
         activeKitchenId={activeKitchen?.id ?? null}
         userName={userName}
+        isGuest={isGuest}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         {children}

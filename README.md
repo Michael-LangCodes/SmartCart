@@ -7,7 +7,7 @@ SmartCart is a full-stack web app built with **Next.js (App Router) + Supabase**
 
 ## Features
 
-- **Accounts** - email/password auth with server-side sessions (Supabase Auth + `@supabase/ssr`).
+- **Accounts** - email/password auth with server-side sessions (Supabase Auth + `@supabase/ssr`), plus an optional open "guest" mode (anonymous sign-in) so you can use the app without an account. Toggle with `NEXT_PUBLIC_REQUIRE_AUTH`.
 - **My Recipes** - create, edit and delete recipes with a dynamic list of ingredients.
 - **Community Library** - mark a recipe public to share it, and clone anyone's public recipe into your own collection.
 - **Kitchens** - shared spaces you create or join with an invite code. Members plan and shop together.
@@ -78,18 +78,39 @@ Fill in the values:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-or-publishable-key>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_REQUIRE_AUTH=false
 ```
 
-### 4. Configure auth redirect URLs
+### 4. Choose an auth mode
+
+SmartCart can run in two modes, controlled by `NEXT_PUBLIC_REQUIRE_AUTH`:
+
+- **Open mode** (`false` or unset, the default): visitors are automatically
+  signed in as an anonymous **guest** (one per browser) so they can use the
+  whole app without creating an account. Requires enabling
+  **Authentication -> Providers -> Anonymous Sign-Ins** in Supabase (locally:
+  `enable_anonymous_sign_ins = true` in `config.toml`). Guests can still open
+  the **Sign in** link in the top bar to create a real account.
+- **Required mode** (`true`): login/signup is mandatory; unauthenticated users
+  are redirected to `/login`.
+
+To switch back to required accounts later, set `NEXT_PUBLIC_REQUIRE_AUTH=true`
+and restart/redeploy - no code changes. (You may then disable Anonymous
+Sign-Ins in Supabase.)
+
+Guest data is per-browser and is not shared across devices (a property of
+anonymous auth). Sharing between guests still works via kitchen invite codes.
+
+### 5. Configure auth redirect URLs
 
 In Supabase **Authentication -> URL Configuration**, add
 `http://localhost:3000/auth/callback` (and your production URL) to the list of
 redirect URLs. For local development you can disable "Confirm email" under
 **Authentication -> Providers -> Email** so sign-up logs you straight in.
 
-### 5. Run the app
+### 6. Run the app
 
 ```bash
 npm install
@@ -100,7 +121,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## How it fits together
 
-1. Sign up, then create a **Kitchen** (or join one with an invite code). The active kitchen is stored in a cookie and switched from the top-right dropdown.
+1. In open mode you're dropped straight into the app as a guest; otherwise sign up first. Either way, create a **Kitchen** (or join one with an invite code). The active kitchen is stored in a cookie and switched from the top-right dropdown.
 2. Add **Recipes** with their ingredients. Toggle "Share to community library" to publish, or clone others' recipes from the **Library**.
 3. Open the **Planner**, pick a week, and drop recipes into each day's meal slots.
 4. Go to **Grocery**, hit **Generate from plan**, and SmartCart aggregates every ingredient from that week's recipes (summing quantities by name + unit). Check items off as you shop, or add extras manually. Everyone in the kitchen sees the same list.
@@ -118,7 +139,7 @@ Authorization is enforced entirely by Postgres **Row Level Security**:
 Deploy to [Vercel](https://vercel.com):
 
 1. Push this repo to GitHub and import it in Vercel.
-2. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_SITE_URL` (your deployed URL) as environment variables.
+2. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL` (your deployed URL), and `NEXT_PUBLIC_REQUIRE_AUTH` as environment variables.
 3. Add your production `/auth/callback` URL to Supabase's redirect URL allow-list.
 
 ## Scripts

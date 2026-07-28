@@ -22,6 +22,12 @@ export default async function LoginPage({
           Sign-in link was invalid or expired. Please try again.
         </p>
       )}
+      {error === "guest" && (
+        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+          Guest mode is unavailable. Enable &quot;Anonymous Sign-Ins&quot; in your
+          Supabase project, or sign in below.
+        </p>
+      )}
       <AuthForm mode="login" redirectTo={redirect} />
     </div>
   );

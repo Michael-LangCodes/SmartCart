@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { REQUIRE_AUTH } from "@/lib/auth-config";
 
 /** Route prefixes that require an authenticated user. */
 const PROTECTED_PREFIXES = [
@@ -50,13 +51,26 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("redirect", pathname);
+    if (REQUIRE_AUTH) {
+      // Account portal: send unauthenticated users to sign in.
+      url.pathname = "/login";
+      url.searchParams.set("redirect", pathname);
+    } else {
+      // Open mode: silently establish an anonymous "guest" session.
+      url.pathname = "/auth/guest";
+      url.search = "";
+      url.searchParams.set("next", pathname);
+    }
     return NextResponse.redirect(url);
   }
 
-  // Signed-in users shouldn't sit on the auth pages.
-  if (user && (pathname === "/login" || pathname === "/signup")) {
+  // Permanent (non-anonymous) users shouldn't sit on the auth pages. Guests are
+  // allowed here so they can upgrade to a real account.
+  if (
+    user &&
+    !user.is_anonymous &&
+    (pathname === "/login" || pathname === "/signup")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/planner";
     url.search = "";
