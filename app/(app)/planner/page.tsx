@@ -146,8 +146,8 @@ export default async function PlannerPage({
             Add one
           </Link>{" "}
           or grab some from the{" "}
-          <Link href="/library" className="font-medium underline">
-            community library
+          <Link href="/cookbook" className="font-medium underline">
+            cookbook
           </Link>{" "}
           to start planning.
         </p>

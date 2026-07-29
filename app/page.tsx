@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 const FEATURES = [
   {
     icon: BookOpen,
-    title: "Recipe library",
-    body: "Save your own recipes and browse a shared community library.",
+    title: "Cookbook",
+    body: "Save your own recipes and browse a shared community cookbook.",
   },
   {
     icon: CalendarDays,

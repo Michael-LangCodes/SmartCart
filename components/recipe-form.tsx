@@ -84,7 +84,7 @@ export function RecipeForm({ recipe }: { recipe?: RecipeWithIngredients }) {
               defaultChecked={recipe?.is_public ?? false}
               className="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
             />
-            Share to community library
+            Share to cookbook
           </label>
         </div>
       </div>

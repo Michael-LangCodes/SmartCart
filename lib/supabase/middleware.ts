@@ -5,7 +5,7 @@ import { REQUIRE_AUTH } from "@/lib/auth-config";
 /** Route prefixes that require an authenticated user. */
 const PROTECTED_PREFIXES = [
   "/recipes",
-  "/library",
+  "/cookbook",
   "/kitchens",
   "/planner",
   "/grocery",

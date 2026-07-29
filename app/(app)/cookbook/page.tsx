@@ -7,7 +7,7 @@ import type { Recipe } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export default async function LibraryPage() {
+export default async function CookbookPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,7 +27,7 @@ export default async function LibraryPage() {
   return (
     <div>
       <PageHeader
-        title="Community Library"
+        title="Cookbook"
         description="Public recipes shared by other SmartCart users. Add any to your own collection."
       />
 

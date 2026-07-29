@@ -93,7 +93,7 @@ export async function saveRecipe(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/recipes");
-  revalidatePath("/library");
+  revalidatePath("/cookbook");
   redirect("/recipes");
 }
 
@@ -111,7 +111,7 @@ export async function deleteRecipe(formData: FormData): Promise<void> {
   revalidatePath("/recipes");
 }
 
-/** Copy a public recipe (and its ingredients) into the current user's library. */
+/** Copy a public recipe (and its ingredients) into the current user's recipes. */
 export async function cloneRecipe(formData: FormData): Promise<void> {
   const sourceId = String(formData.get("id") ?? "");
   if (!sourceId) return;

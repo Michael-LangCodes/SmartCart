@@ -6,7 +6,7 @@ import {
   ShoppingCart,
   CalendarDays,
   BookOpen,
-  Library,
+  BookMarked,
   Users,
   LogOut,
   LogIn,
@@ -20,7 +20,7 @@ const LINKS = [
   { href: "/planner", label: "Planner", icon: CalendarDays },
   { href: "/grocery", label: "Grocery", icon: ShoppingCart },
   { href: "/recipes", label: "My Recipes", icon: BookOpen },
-  { href: "/library", label: "Library", icon: Library },
+  { href: "/cookbook", label: "Cookbook", icon: BookMarked },
   { href: "/kitchens", label: "Kitchens", icon: Users },
 ];
 
