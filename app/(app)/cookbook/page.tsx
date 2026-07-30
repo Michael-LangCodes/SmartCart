@@ -4,6 +4,7 @@ import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { cloneRecipe } from "../recipes/actions";
 import { recipeTimingLine } from "@/lib/recipe-meta";
+import { RecipeTagBadges } from "@/components/recipe-tags";
 import type { Recipe } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,7 @@ export default async function CookbookPage() {
                     {recipeTimingLine(recipe)}
                   </p>
                 )}
+                <RecipeTagBadges tags={recipe.tags} />
                 <form action={cloneRecipe} className="mt-4">
                   <input type="hidden" name="id" value={recipe.id} />
                   <Button type="submit" variant="outline" size="sm" className="w-full">

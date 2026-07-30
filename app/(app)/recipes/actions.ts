@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isDifficulty } from "@/lib/recipe-meta";
+import { isDifficulty, parseTags } from "@/lib/recipe-meta";
 
 type ParsedIngredient = {
   name: string;
@@ -64,6 +64,7 @@ export async function saveRecipe(formData: FormData): Promise<void> {
     String(formData.get("cook_minutes") ?? ""),
   );
   const isPublic = formData.get("is_public") === "on";
+  const tags = parseTags(String(formData.get("tags") ?? ""));
   const ingredients = parseIngredients(formData);
 
   if (!title) return;
@@ -76,6 +77,7 @@ export async function saveRecipe(formData: FormData): Promise<void> {
     difficulty,
     prep_minutes,
     cook_minutes,
+    tags,
     is_public: isPublic,
   };
 
@@ -157,6 +159,7 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
       difficulty: source.difficulty,
       prep_minutes: source.prep_minutes,
       cook_minutes: source.cook_minutes,
+      tags: source.tags ?? [],
       is_public: false,
     })
     .select("id")

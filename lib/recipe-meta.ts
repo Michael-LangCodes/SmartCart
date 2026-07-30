@@ -1,4 +1,4 @@
-/** Difficulty / timing helpers for recipes. */
+/** Difficulty / timing / tag helpers for recipes. */
 
 export const DIFFICULTY_OPTIONS = [
   { value: "easy", label: "Easy" },
@@ -8,6 +8,22 @@ export const DIFFICULTY_OPTIONS = [
 
 export type Difficulty = (typeof DIFFICULTY_OPTIONS)[number]["value"];
 
+/** Common tags users can tap; freeform tags are also allowed. */
+export const SUGGESTED_TAGS = [
+  "healthy",
+  "high protein",
+  "low carb",
+  "quick",
+  "budget",
+  "comfort food",
+  "meal prep",
+  "kid-friendly",
+  "gluten-free",
+  "dairy-free",
+  "vegetarian",
+  "vegan",
+] as const;
+
 export function isDifficulty(value: string): value is Difficulty {
   return DIFFICULTY_OPTIONS.some((d) => d.value === value);
 }
@@ -15,6 +31,24 @@ export function isDifficulty(value: string): value is Difficulty {
 export function difficultyLabel(value: string | null | undefined): string {
   if (!value) return "";
   return DIFFICULTY_OPTIONS.find((d) => d.value === value)?.label ?? value;
+}
+
+/** Normalize tags: trim, lowercase, dedupe, drop empties. */
+export function parseTags(raw: string | string[]): string[] {
+  const parts = Array.isArray(raw) ? raw : raw.split(/[,;\n]+/);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const tag = part.trim().toLowerCase().replace(/\s+/g, " ");
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    out.push(tag);
+  }
+  return out;
+}
+
+export function formatTags(tags: string[] | null | undefined): string {
+  return (tags ?? []).join(", ");
 }
 
 /** Format minutes as "15 min" or "1 hr 20 min". */

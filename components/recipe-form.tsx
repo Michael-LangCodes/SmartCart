@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DIFFICULTY_OPTIONS } from "@/lib/recipe-meta";
+import { RecipeTagsField } from "@/components/recipe-tags";
 import type { RecipeWithIngredients } from "@/lib/types";
 
 type Row = { key: number; name: string; quantity: string; unit: string };
@@ -128,6 +129,8 @@ export function RecipeForm({ recipe }: { recipe?: RecipeWithIngredients }) {
             Share to cookbook
           </label>
         </div>
+
+        <RecipeTagsField initialTags={recipe?.tags ?? []} />
       </div>
 
       <div className="flex flex-col gap-3">

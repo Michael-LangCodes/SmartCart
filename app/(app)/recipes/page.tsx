@@ -5,6 +5,7 @@ import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { deleteRecipe } from "./actions";
 import { recipeTimingLine } from "@/lib/recipe-meta";
+import { RecipeTagBadges } from "@/components/recipe-tags";
 import type { Recipe } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -93,6 +94,7 @@ export default async function RecipesPage() {
                     {recipeTimingLine(recipe)}
                   </p>
                 )}
+                <RecipeTagBadges tags={recipe.tags} />
 
                 <div className="mt-4 flex gap-2">
                   <Link href={`/recipes/${recipe.id}`} className="flex-1">

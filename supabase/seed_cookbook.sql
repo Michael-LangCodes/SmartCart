@@ -57,7 +57,7 @@ end $$;
 -- ---------------------------------------------------------------------------
 insert into public.recipes (
   id, owner_id, title, description, instructions, servings,
-  difficulty, prep_minutes, cook_minutes, is_public
+  difficulty, prep_minutes, cook_minutes, tags, is_public
 ) values
 (
   'b0000000-0000-4000-8000-000000000001',
@@ -67,6 +67,7 @@ insert into public.recipes (
   E'1. Heat olive oil in a large pan; sauté onion, carrot, and garlic until soft.\n2. Add ground beef and cook until browned.\n3. Stir in tomato paste, crushed tomatoes, salt, and pepper. Simmer 20–30 minutes.\n4. Boil spaghetti until al dente. Drain and toss with sauce.\n5. Serve with grated Parmesan.',
   4,
   'medium', 15, 35,
+  array['comfort food', 'high protein'],
   true
 ),
 (
@@ -77,6 +78,7 @@ insert into public.recipes (
   E'1. Slice chicken into thin strips; toss with a pinch of salt.\n2. Whisk soy sauce, ginger, garlic, and a splash of oil for the sauce.\n3. Stir-fry chicken in a hot pan until cooked through; set aside.\n4. Stir-fry broccoli, bell pepper, and snap peas until tender-crisp.\n5. Return chicken, pour in sauce, and toss 1–2 minutes. Serve over rice.',
   4,
   'easy', 15, 15,
+  array['quick', 'high protein', 'healthy'],
   true
 ),
 (
@@ -87,6 +89,7 @@ insert into public.recipes (
   E'1. Combine oats, milk, yogurt, chia seeds, and maple syrup in a jar.\n2. Stir well, cover, and refrigerate overnight (at least 6 hours).\n3. In the morning, top with berries and a spoonful of peanut butter.\n4. Eat cold or warm gently in the microwave.',
   2,
   'easy', 5, 0,
+  array['meal prep', 'healthy', 'vegetarian'],
   true
 ),
 (
@@ -97,6 +100,7 @@ insert into public.recipes (
   E'1. Slice tomatoes and mozzarella into rounds.\n2. Arrange alternating slices on a platter with basil leaves.\n3. Drizzle with olive oil and balsamic vinegar.\n4. Season with salt and freshly cracked pepper. Serve immediately.',
   4,
   'easy', 10, 0,
+  array['quick', 'vegetarian', 'healthy'],
   true
 ),
 (
@@ -107,6 +111,7 @@ insert into public.recipes (
   E'1. Preheat oven to 400°F (200°C).\n2. Toss broccoli and potatoes with olive oil, salt, and pepper; spread on a sheet pan.\n3. Roast 15 minutes, then push veggies aside and add salmon fillets.\n4. Season salmon with lemon, garlic, salt, and pepper.\n5. Roast another 12–15 minutes until salmon flakes easily. Serve with lemon wedges.',
   4,
   'easy', 10, 30,
+  array['healthy', 'high protein', 'meal prep'],
   true
 ),
 (
@@ -117,6 +122,7 @@ insert into public.recipes (
   E'1. Warm black beans with cumin, chili powder, garlic, and a splash of water.\n2. Warm tortillas in a dry skillet.\n3. Fill tortillas with beans, shredded lettuce, salsa, and cheese.\n4. Finish with a squeeze of lime and cilantro if you have it.',
   4,
   'easy', 10, 10,
+  array['vegetarian', 'budget', 'quick', 'kid-friendly'],
   true
 ),
 (
@@ -127,6 +133,7 @@ insert into public.recipes (
   E'1. Sauté onion, celery, and carrot in olive oil until softened.\n2. Add garlic, then broth, diced tomatoes, and bay leaf.\n3. Stir in potatoes, green beans, and zucchini; simmer until tender (about 20 minutes).\n4. Season with salt, pepper, and herbs. Remove bay leaf and serve.',
   6,
   'easy', 15, 30,
+  array['vegan', 'healthy', 'budget', 'meal prep'],
   true
 ),
 (
@@ -137,6 +144,7 @@ insert into public.recipes (
   E'1. Mash bananas in a bowl; whisk in eggs, milk, and melted butter.\n2. Stir in flour, baking powder, and a pinch of salt until just combined.\n3. Cook scoopfuls on a buttered griddle over medium heat until bubbles form; flip.\n4. Serve with maple syrup and fresh fruit.',
   4,
   'easy', 10, 15,
+  array['kid-friendly', 'vegetarian', 'comfort food'],
   true
 )
 on conflict (id) do update set
@@ -147,6 +155,7 @@ on conflict (id) do update set
   difficulty = excluded.difficulty,
   prep_minutes = excluded.prep_minutes,
   cook_minutes = excluded.cook_minutes,
+  tags = excluded.tags,
   is_public = true,
   owner_id = excluded.owner_id;
 
