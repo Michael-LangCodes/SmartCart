@@ -68,7 +68,14 @@ supabase link --project-ref <your-project-ref>
 supabase db push
 ```
 
-### 3. Configure environment variables
+### 3. (Optional) Load sample cookbook recipes
+
+To populate the **Cookbook** with starter public recipes, run
+[`supabase/seed_cookbook.sql`](supabase/seed_cookbook.sql) in the SQL Editor.
+It creates a system "SmartCart Cookbook" owner and 8 public recipes with
+ingredients. Safe to re-run.
+
+### 4. Configure environment variables
 
 ```bash
 cp .env.local.example .env.local
@@ -83,7 +90,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_REQUIRE_AUTH=false
 ```
 
-### 4. Choose an auth mode
+### 5. Choose an auth mode
 
 SmartCart can run in two modes, controlled by `NEXT_PUBLIC_REQUIRE_AUTH`:
 
@@ -103,14 +110,14 @@ Sign-Ins in Supabase.)
 Guest data is per-browser and is not shared across devices (a property of
 anonymous auth). Sharing between guests still works via kitchen invite codes.
 
-### 5. Configure auth redirect URLs
+### 6. Configure auth redirect URLs
 
 In Supabase **Authentication -> URL Configuration**, add
 `http://localhost:3000/auth/callback` (and your production URL) to the list of
 redirect URLs. For local development you can disable "Confirm email" under
 **Authentication -> Providers -> Email** so sign-up logs you straight in.
 
-### 6. Run the app
+### 7. Run the app
 
 ```bash
 npm install
