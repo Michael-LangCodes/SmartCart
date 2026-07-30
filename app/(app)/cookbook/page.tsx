@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { cloneRecipe } from "../recipes/actions";
+import { recipeTimingLine } from "@/lib/recipe-meta";
 import type { Recipe } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,11 @@ export default async function CookbookPage() {
                   {count} ingredient{count === 1 ? "" : "s"}
                   {recipe.servings ? ` · serves ${recipe.servings}` : ""}
                 </p>
+                {recipeTimingLine(recipe) && (
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    {recipeTimingLine(recipe)}
+                  </p>
+                )}
                 <form action={cloneRecipe} className="mt-4">
                   <input type="hidden" name="id" value={recipe.id} />
                   <Button type="submit" variant="outline" size="sm" className="w-full">

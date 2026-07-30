@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { DIFFICULTY_OPTIONS } from "@/lib/recipe-meta";
 import type { RecipeWithIngredients } from "@/lib/types";
 
 type Row = { key: number; name: string; quantity: string; unit: string };
@@ -76,7 +77,47 @@ export function RecipeForm({ recipe }: { recipe?: RecipeWithIngredients }) {
             placeholder="4"
           />
         </div>
-        <div className="flex items-end">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="difficulty">Difficulty</Label>
+          <select
+            id="difficulty"
+            name="difficulty"
+            defaultValue={recipe?.difficulty ?? ""}
+            className="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          >
+            <option value="">— Not set —</option>
+            {DIFFICULTY_OPTIONS.map((d) => (
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="prep_minutes">Prep time (minutes)</Label>
+          <Input
+            id="prep_minutes"
+            name="prep_minutes"
+            type="number"
+            min={0}
+            step={1}
+            defaultValue={recipe?.prep_minutes ?? ""}
+            placeholder="15"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="cook_minutes">Cook time (minutes)</Label>
+          <Input
+            id="cook_minutes"
+            name="cook_minutes"
+            type="number"
+            min={0}
+            step={1}
+            defaultValue={recipe?.cook_minutes ?? ""}
+            placeholder="30"
+          />
+        </div>
+        <div className="flex items-end sm:col-span-2">
           <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
             <input
               type="checkbox"

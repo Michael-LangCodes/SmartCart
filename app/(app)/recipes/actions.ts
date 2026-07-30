@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isDifficulty } from "@/lib/recipe-meta";
 
 type ParsedIngredient = {
   name: string;
@@ -10,6 +11,13 @@ type ParsedIngredient = {
   unit: string | null;
   position: number;
 };
+
+function parseOptionalInt(raw: string): number | null {
+  const trimmed = raw.trim();
+  if (trimmed === "") return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+}
 
 function parseIngredients(formData: FormData): ParsedIngredient[] {
   const names = formData.getAll("ing_name").map(String);
@@ -47,23 +55,36 @@ export async function saveRecipe(formData: FormData): Promise<void> {
     String(formData.get("instructions") ?? "").trim() || null;
   const servingsRaw = String(formData.get("servings") ?? "").trim();
   const servings = servingsRaw === "" ? null : Number(servingsRaw);
+  const difficultyRaw = String(formData.get("difficulty") ?? "").trim();
+  const difficulty = isDifficulty(difficultyRaw) ? difficultyRaw : null;
+  const prep_minutes = parseOptionalInt(
+    String(formData.get("prep_minutes") ?? ""),
+  );
+  const cook_minutes = parseOptionalInt(
+    String(formData.get("cook_minutes") ?? ""),
+  );
   const isPublic = formData.get("is_public") === "on";
   const ingredients = parseIngredients(formData);
 
   if (!title) return;
+
+  const payload = {
+    title,
+    description,
+    instructions,
+    servings: servings !== null && Number.isFinite(servings) ? servings : null,
+    difficulty,
+    prep_minutes,
+    cook_minutes,
+    is_public: isPublic,
+  };
 
   let recipeId = id;
 
   if (id) {
     await supabase
       .from("recipes")
-      .update({
-        title,
-        description,
-        instructions,
-        servings: servings !== null && Number.isFinite(servings) ? servings : null,
-        is_public: isPublic,
-      })
+      .update(payload)
       .eq("id", id)
       .eq("owner_id", user.id);
 
@@ -74,11 +95,7 @@ export async function saveRecipe(formData: FormData): Promise<void> {
       .from("recipes")
       .insert({
         owner_id: user.id,
-        title,
-        description,
-        instructions,
-        servings: servings !== null && Number.isFinite(servings) ? servings : null,
-        is_public: isPublic,
+        ...payload,
       })
       .select("id")
       .single();
@@ -137,6 +154,9 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
       description: source.description,
       instructions: source.instructions,
       servings: source.servings,
+      difficulty: source.difficulty,
+      prep_minutes: source.prep_minutes,
+      cook_minutes: source.cook_minutes,
       is_public: false,
     })
     .select("id")

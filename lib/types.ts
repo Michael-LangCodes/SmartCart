@@ -28,6 +28,9 @@ export type Recipe = {
   description: string | null;
   instructions: string | null;
   servings: number | null;
+  difficulty: "easy" | "medium" | "hard" | null;
+  prep_minutes: number | null;
+  cook_minutes: number | null;
   is_public: boolean;
   created_at: string;
 };

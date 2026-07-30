@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { deleteRecipe } from "./actions";
+import { recipeTimingLine } from "@/lib/recipe-meta";
 import type { Recipe } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -87,6 +88,11 @@ export default async function RecipesPage() {
                   {count} ingredient{count === 1 ? "" : "s"}
                   {recipe.servings ? ` · serves ${recipe.servings}` : ""}
                 </p>
+                {recipeTimingLine(recipe) && (
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    {recipeTimingLine(recipe)}
+                  </p>
+                )}
 
                 <div className="mt-4 flex gap-2">
                   <Link href={`/recipes/${recipe.id}`} className="flex-1">
