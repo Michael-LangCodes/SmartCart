@@ -8,6 +8,7 @@ import {
   BookOpen,
   BookMarked,
   Users,
+  UserRound,
   LogOut,
   LogIn,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const LINKS = [
   { href: "/recipes", label: "My Recipes", icon: BookOpen },
   { href: "/cookbook", label: "Cookbook", icon: BookMarked },
   { href: "/kitchens", label: "Kitchens", icon: Users },
+  { href: "/profile", label: "Profile", icon: UserRound },
 ];
 
 export function Nav({

@@ -9,10 +9,22 @@ import {
   JoinKitchenForm,
   InviteCode,
 } from "@/components/kitchen-forms";
+import {
+  AddKitchenPersonForm,
+  KitchenPeopleList,
+} from "@/components/kitchen-people";
 import { leaveKitchen, deleteKitchen } from "./actions";
-import type { KitchenMember } from "@/lib/types";
+import { dietLabel, formatAllergies } from "@/lib/diet";
+import type { KitchenMember, KitchenPerson, Profile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+type FavRow = {
+  person_id: string;
+  recipe_id: string;
+  position: number;
+  recipes: { id: string; title: string } | null;
+};
 
 export default async function KitchensPage() {
   const supabase = await createClient();
@@ -24,9 +36,24 @@ export default async function KitchensPage() {
   const active = await getActiveKitchen(kitchens);
   const kitchenIds = kitchens.map((k) => k.id);
 
-  // Members across all my kitchens, plus a lookup of display names.
   const membersByKitchen = new Map<string, KitchenMember[]>();
-  const nameById = new Map<string, string>();
+  const profileById = new Map<
+    string,
+    Pick<Profile, "display_name" | "allergies" | "diet_type" | "serving_multiplier">
+  >();
+  const peopleByKitchen = new Map<
+    string,
+    (KitchenPerson & {
+      favorites: { position: number; recipe_id: string; title: string }[];
+    })[]
+  >();
+
+  const { data: recipeRows } = await supabase
+    .from("recipes")
+    .select("id, title")
+    .or(`owner_id.eq.${user!.id},is_public.eq.true`)
+    .order("title");
+  const recipes = (recipeRows ?? []) as { id: string; title: string }[];
 
   if (kitchenIds.length > 0) {
     const { data: members } = await supabase
@@ -45,11 +72,49 @@ export default async function KitchensPage() {
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, allergies, diet_type, serving_multiplier")
         .in("id", userIds);
       for (const p of profiles ?? []) {
-        nameById.set(p.id, p.display_name ?? "Member");
+        profileById.set(p.id, p);
       }
+    }
+
+    const { data: people } = await supabase
+      .from("kitchen_people")
+      .select("*")
+      .in("kitchen_id", kitchenIds)
+      .order("name");
+
+    const personList = (people ?? []) as KitchenPerson[];
+    const personIds = personList.map((p) => p.id);
+
+    const favByPerson = new Map<
+      string,
+      { position: number; recipe_id: string; title: string }[]
+    >();
+    if (personIds.length > 0) {
+      const { data: favs } = await supabase
+        .from("kitchen_person_favorites")
+        .select("person_id, recipe_id, position, recipes(id, title)")
+        .in("person_id", personIds);
+      for (const f of (favs ?? []) as unknown as FavRow[]) {
+        const arr = favByPerson.get(f.person_id) ?? [];
+        arr.push({
+          position: f.position,
+          recipe_id: f.recipe_id,
+          title: f.recipes?.title ?? "Recipe",
+        });
+        favByPerson.set(f.person_id, arr);
+      }
+    }
+
+    for (const person of personList) {
+      const arr = peopleByKitchen.get(person.kitchen_id) ?? [];
+      arr.push({
+        ...person,
+        favorites: favByPerson.get(person.id) ?? [],
+      });
+      peopleByKitchen.set(person.kitchen_id, arr);
     }
   }
 
@@ -57,7 +122,7 @@ export default async function KitchensPage() {
     <div>
       <PageHeader
         title="Kitchens"
-        description="A kitchen is a shared space where members plan meals and build grocery lists together."
+        description="A kitchen is a shared household space. Invite account members with a code, or add people without accounts and track their diet prefs."
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
@@ -85,9 +150,10 @@ export default async function KitchensPage() {
           description="Create your own kitchen or join one with an invite code to start planning together."
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           {kitchens.map((kitchen) => {
             const members = membersByKitchen.get(kitchen.id) ?? [];
+            const people = peopleByKitchen.get(kitchen.id) ?? [];
             const isOwner = kitchen.created_by === user!.id;
             const isActive = active?.id === kitchen.id;
             return (
@@ -105,7 +171,7 @@ export default async function KitchensPage() {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4">
+                <CardContent className="flex flex-col gap-5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-zinc-500 dark:text-zinc-400">
                       Invite code
@@ -115,24 +181,49 @@ export default async function KitchensPage() {
 
                   <div>
                     <p className="mb-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                      Members ({members.length})
+                      Account members ({members.length})
                     </p>
-                    <ul className="flex flex-col gap-1">
-                      {members.map((m) => (
-                        <li
-                          key={m.user_id}
-                          className="flex items-center gap-1.5 text-sm text-zinc-700 dark:text-zinc-300"
-                        >
-                          {m.role === "owner" && (
-                            <Crown className="h-3.5 w-3.5 text-amber-500" />
-                          )}
-                          {nameById.get(m.user_id) ?? "Member"}
-                          {m.user_id === user!.id && (
-                            <span className="text-xs text-zinc-400">(you)</span>
-                          )}
-                        </li>
-                      ))}
+                    <ul className="flex flex-col gap-2">
+                      {members.map((m) => {
+                        const p = profileById.get(m.user_id);
+                        return (
+                          <li
+                            key={m.user_id}
+                            className="text-sm text-zinc-700 dark:text-zinc-300"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              {m.role === "owner" && (
+                                <Crown className="h-3.5 w-3.5 text-amber-500" />
+                              )}
+                              {p?.display_name ?? "Member"}
+                              {m.user_id === user!.id && (
+                                <span className="text-xs text-zinc-400">(you)</span>
+                              )}
+                            </div>
+                            {p && (
+                              <p className="ml-5 text-xs text-zinc-500">
+                                {dietLabel(p.diet_type)} · ×
+                                {p.serving_multiplier} servings
+                                {p.allergies?.length
+                                  ? ` · ${formatAllergies(p.allergies)}`
+                                  : ""}
+                              </p>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                      Household people — no account ({people.length})
+                    </p>
+                    <KitchenPeopleList people={people} recipes={recipes} />
+                    <AddKitchenPersonForm
+                      kitchenId={kitchen.id}
+                      recipes={recipes}
+                    />
                   </div>
 
                   <div className="flex gap-2">

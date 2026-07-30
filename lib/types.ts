@@ -3,9 +3,21 @@
  * These are hand-maintained; keep them in sync with supabase/migrations.
  */
 
+import type { DietType } from "@/lib/diet";
+
 export type Profile = {
   id: string;
   display_name: string | null;
+  allergies: string[];
+  diet_type: DietType;
+  serving_multiplier: number;
+  created_at: string;
+};
+
+export type ProfileFavoriteRecipe = {
+  profile_id: string;
+  recipe_id: string;
+  position: number;
   created_at: string;
 };
 
@@ -52,6 +64,31 @@ export type KitchenMember = {
 
 export type KitchenMemberWithProfile = KitchenMember & {
   profiles: Pick<Profile, "id" | "display_name"> | null;
+};
+
+/** Non-account household person (no login). */
+export type KitchenPerson = {
+  id: string;
+  kitchen_id: string;
+  name: string;
+  allergies: string[];
+  diet_type: DietType;
+  serving_multiplier: number;
+  notes: string | null;
+  created_at: string;
+};
+
+export type KitchenPersonFavorite = {
+  person_id: string;
+  recipe_id: string;
+  position: number;
+  created_at: string;
+};
+
+export type KitchenPersonWithFavorites = KitchenPerson & {
+  kitchen_person_favorites: (KitchenPersonFavorite & {
+    recipes: Pick<Recipe, "id" | "title"> | null;
+  })[];
 };
 
 export type MealPlan = {
