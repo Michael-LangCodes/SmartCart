@@ -77,10 +77,14 @@ export default async function PlannerPage({
 
   const { data: recipeRows } = await supabase
     .from("recipes")
-    .select("id, title")
+    .select("id, title, origin")
     .or(`owner_id.eq.${user!.id},is_public.eq.true`)
     .order("title");
-  const recipes = (recipeRows ?? []) as { id: string; title: string }[];
+  const recipes = (recipeRows ?? []) as {
+    id: string;
+    title: string;
+    origin?: string | null;
+  }[];
 
   const bySlot = new Map<string, EntryRow[]>();
   for (const e of entries) {

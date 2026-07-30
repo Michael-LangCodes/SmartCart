@@ -4,8 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } 
 import { createPortal } from "react-dom";
 import { Plus, Search, X } from "lucide-react";
 import { addMealEntry } from "@/app/(app)/planner/actions";
+import { RecipeOriginBadge } from "@/components/recipe-origin-badge";
 
-type RecipeOption = { id: string; title: string };
+type RecipeOption = { id: string; title: string; origin?: string | null };
 
 export function AddMeal({
   kitchenId,
@@ -165,9 +166,13 @@ export function AddMeal({
                     type="button"
                     disabled={pending}
                     onClick={() => pick(r.id)}
-                    className="w-full truncate px-2 py-1.5 text-left text-xs text-zinc-700 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-emerald-950 dark:hover:text-emerald-200"
+                    className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs text-zinc-700 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-emerald-950 dark:hover:text-emerald-200"
                   >
-                    {r.title}
+                    <span className="min-w-0 flex-1 truncate">{r.title}</span>
+                    <RecipeOriginBadge
+                      origin={r.origin ?? "user"}
+                      compact
+                    />
                   </button>
                 </li>
               ))

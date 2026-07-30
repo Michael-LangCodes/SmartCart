@@ -97,6 +97,8 @@ export async function saveRecipe(formData: FormData): Promise<void> {
       .from("recipes")
       .insert({
         owner_id: user.id,
+        origin: "user",
+        source_recipe_id: null,
         ...payload,
       })
       .select("id")
@@ -160,6 +162,8 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
       prep_minutes: source.prep_minutes,
       cook_minutes: source.cook_minutes,
       tags: source.tags ?? [],
+      origin: "cookbook",
+      source_recipe_id: source.id,
       is_public: false,
     })
     .select("id")

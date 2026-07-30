@@ -21,6 +21,8 @@ export type ProfileFavoriteRecipe = {
   created_at: string;
 };
 
+export type RecipeOrigin = "user" | "cookbook";
+
 export type Recipe = {
   id: string;
   owner_id: string;
@@ -32,6 +34,8 @@ export type Recipe = {
   prep_minutes: number | null;
   cook_minutes: number | null;
   tags: string[];
+  origin: RecipeOrigin;
+  source_recipe_id: string | null;
   is_public: boolean;
   created_at: string;
 };

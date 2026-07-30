@@ -64,6 +64,7 @@ Run the two migration files, in order, in the Supabase **SQL Editor**
 3. `supabase/migrations/0003_profiles_and_household_people.sql` - profile diet prefs, favorites, and household people (non-members)
 4. `supabase/migrations/0004_recipe_timing_difficulty.sql` - recipe difficulty, prep time, and cook time
 5. `supabase/migrations/0005_recipe_tags.sql` - recipe tags (healthy, high protein, etc.)
+6. `supabase/migrations/0006_recipe_origin.sql` - distinguish user-created vs cookbook recipes
 
 Using the [Supabase CLI](https://supabase.com/docs/guides/cli):
 

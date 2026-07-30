@@ -6,15 +6,17 @@ import { CopyPlus, Pencil, Trash2, Globe, Lock, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/page-header";
 import { RecipeTagBadges } from "@/components/recipe-tags";
+import { RecipeOriginBadge } from "@/components/recipe-origin-badge";
 import { recipeTimingLine } from "@/lib/recipe-meta";
 import { deleteRecipe, cloneRecipe } from "@/app/(app)/recipes/actions";
-import type { Recipe } from "@/lib/types";
+import type { Recipe, RecipeOrigin } from "@/lib/types";
 
 type RecipeCard = Recipe & {
   recipe_ingredients: { count: number }[];
 };
 
 type SortMode = "newest" | "title" | "tags";
+type OriginFilter = "all" | RecipeOrigin;
 
 function collectTags(recipes: RecipeCard[]): string[] {
   const set = new Set<string>();
@@ -27,7 +29,6 @@ function collectTags(recipes: RecipeCard[]): string[] {
 function recipeMatchesTags(recipe: RecipeCard, selected: string[]): boolean {
   if (selected.length === 0) return true;
   const tags = recipe.tags ?? [];
-  // Match if the recipe has every selected tag (AND).
   return selected.every((t) => tags.includes(t));
 }
 
@@ -46,11 +47,19 @@ export function RecipeCatalog({
 }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sort, setSort] = useState<SortMode>("newest");
+  const [originFilter, setOriginFilter] = useState<OriginFilter>("all");
 
   const availableTags = useMemo(() => collectTags(recipes), [recipes]);
 
   const visible = useMemo(() => {
-    const filtered = recipes.filter((r) => recipeMatchesTags(r, selectedTags));
+    const filtered = recipes.filter((r) => {
+      if (!recipeMatchesTags(r, selectedTags)) return false;
+      if (mode === "mine" && originFilter !== "all") {
+        const origin = r.origin ?? "user";
+        if (origin !== originFilter) return false;
+      }
+      return true;
+    });
     const sorted = [...filtered];
     if (sort === "title") {
       sorted.sort((a, b) => a.title.localeCompare(b.title));
@@ -68,7 +77,7 @@ export function RecipeCatalog({
       );
     }
     return sorted;
-  }, [recipes, selectedTags, sort]);
+  }, [recipes, selectedTags, sort, originFilter, mode]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -89,6 +98,34 @@ export function RecipeCatalog({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        {mode === "mine" && (
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Source
+            </p>
+            {(
+              [
+                ["all", "All"],
+                ["user", "Your recipes"],
+                ["cookbook", "From cookbook"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setOriginFilter(value)}
+                className={
+                  originFilter === value
+                    ? "rounded-full bg-zinc-900 px-2.5 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "rounded-full border border-zinc-200 px-2.5 py-1 text-xs text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-300"
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Filter by tags
@@ -194,31 +231,37 @@ export function RecipeCatalog({
                 className="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
               >
                 {mode === "mine" ? (
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-                      {recipe.title}
-                    </h3>
-                    <span
-                      className="flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                      title={recipe.is_public ? "Public" : "Private"}
-                    >
-                      {recipe.is_public ? (
-                        <>
-                          <Globe className="h-3 w-3" /> Public
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-3 w-3" /> Private
-                        </>
-                      )}
-                    </span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                        {recipe.title}
+                      </h3>
+                      <span
+                        className="flex shrink-0 items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                        title={recipe.is_public ? "Shared to cookbook" : "Private"}
+                      >
+                        {recipe.is_public ? (
+                          <>
+                            <Globe className="h-3 w-3" /> Shared
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="h-3 w-3" /> Private
+                          </>
+                        )}
+                      </span>
+                    </div>
+                    <RecipeOriginBadge origin={recipe.origin ?? "user"} />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Utensils className="h-4 w-4 text-emerald-600" />
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-                      {recipe.title}
-                    </h3>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Utensils className="h-4 w-4 shrink-0 text-emerald-600" />
+                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                        {recipe.title}
+                      </h3>
+                    </div>
+                    <RecipeOriginBadge origin="cookbook" />
                   </div>
                 )}
 

@@ -57,7 +57,7 @@ end $$;
 -- ---------------------------------------------------------------------------
 insert into public.recipes (
   id, owner_id, title, description, instructions, servings,
-  difficulty, prep_minutes, cook_minutes, tags, is_public
+  difficulty, prep_minutes, cook_minutes, tags, origin, is_public
 ) values
 (
   'b0000000-0000-4000-8000-000000000001',
@@ -68,6 +68,7 @@ insert into public.recipes (
   4,
   'medium', 15, 35,
   array['comfort food', 'high protein'],
+  'cookbook',
   true
 ),
 (
@@ -79,6 +80,7 @@ insert into public.recipes (
   4,
   'easy', 15, 15,
   array['quick', 'high protein', 'healthy'],
+  'cookbook',
   true
 ),
 (
@@ -90,6 +92,7 @@ insert into public.recipes (
   2,
   'easy', 5, 0,
   array['meal prep', 'healthy', 'vegetarian'],
+  'cookbook',
   true
 ),
 (
@@ -101,6 +104,7 @@ insert into public.recipes (
   4,
   'easy', 10, 0,
   array['quick', 'vegetarian', 'healthy'],
+  'cookbook',
   true
 ),
 (
@@ -112,6 +116,7 @@ insert into public.recipes (
   4,
   'easy', 10, 30,
   array['healthy', 'high protein', 'meal prep'],
+  'cookbook',
   true
 ),
 (
@@ -123,6 +128,7 @@ insert into public.recipes (
   4,
   'easy', 10, 10,
   array['vegetarian', 'budget', 'quick', 'kid-friendly'],
+  'cookbook',
   true
 ),
 (
@@ -134,6 +140,7 @@ insert into public.recipes (
   6,
   'easy', 15, 30,
   array['vegan', 'healthy', 'budget', 'meal prep'],
+  'cookbook',
   true
 ),
 (
@@ -145,6 +152,7 @@ insert into public.recipes (
   4,
   'easy', 10, 15,
   array['kid-friendly', 'vegetarian', 'comfort food'],
+  'cookbook',
   true
 )
 on conflict (id) do update set
@@ -156,6 +164,7 @@ on conflict (id) do update set
   prep_minutes = excluded.prep_minutes,
   cook_minutes = excluded.cook_minutes,
   tags = excluded.tags,
+  origin = excluded.origin,
   is_public = true,
   owner_id = excluded.owner_id;
 
