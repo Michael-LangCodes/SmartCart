@@ -105,19 +105,42 @@ export function RecipeTagsField({
   );
 }
 
-export function RecipeTagBadges({ tags }: { tags: string[] | null | undefined }) {
+export function RecipeTagBadges({
+  tags,
+  onTagClick,
+  activeTags = [],
+}: {
+  tags: string[] | null | undefined;
+  onTagClick?: (tag: string) => void;
+  activeTags?: string[];
+}) {
   const list = tags ?? [];
   if (list.length === 0) return null;
   return (
     <div className="mt-2 flex flex-wrap gap-1">
-      {list.map((tag) => (
-        <span
-          key={tag}
-          className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-        >
-          {tag}
-        </span>
-      ))}
+      {list.map((tag) => {
+        const active = activeTags.includes(tag);
+        const className = active
+          ? "rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white"
+          : "rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
+        if (onTagClick) {
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => onTagClick(tag)}
+              className={className + " hover:opacity-80"}
+            >
+              {tag}
+            </button>
+          );
+        }
+        return (
+          <span key={tag} className={className}>
+            {tag}
+          </span>
+        );
+      })}
     </div>
   );
 }
