@@ -33,7 +33,7 @@ export default async function PlannerPage({
   const { week: weekParam } = await searchParams;
   const week =
     weekParam && ISO_RE.test(weekParam)
-      ? getWeekStart(new Date(weekParam + "T00:00:00Z"))
+      ? getWeekStart(weekParam)
       : getWeekStart(new Date());
 
   const supabase = await createClient();

@@ -23,11 +23,23 @@ export const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner"] as const;
 export type MealType = (typeof MEAL_TYPES)[number];
 
 /**
- * Return the ISO date (YYYY-MM-DD) of the Monday on or before `date`.
- * Used as the canonical key for a weekly meal plan.
+ * Return the ISO date (YYYY-MM-DD) of the Monday on or before the given day.
+ *
+ * - Pass a `Date` for "now" (uses the local calendar day).
+ * - Pass an ISO date string `YYYY-MM-DD` for URL/query params (parsed as a
+ *   pure calendar date, no timezone shift). Mixing these wrongly used to make
+ *   "Next week" snap back to the current week in US timezones.
  */
-export function getWeekStart(date: Date): string {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+export function getWeekStart(input: Date | string = new Date()): string {
+  let d: Date;
+  if (typeof input === "string") {
+    const [y, m, day] = input.split("-").map(Number);
+    d = new Date(Date.UTC(y, m - 1, day));
+  } else {
+    d = new Date(
+      Date.UTC(input.getFullYear(), input.getMonth(), input.getDate()),
+    );
+  }
   const day = d.getUTCDay(); // 0 = Sunday, 1 = Monday, ...
   const diff = (day + 6) % 7; // days since Monday
   d.setUTCDate(d.getUTCDate() - diff);
