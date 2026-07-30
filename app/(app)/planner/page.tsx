@@ -113,7 +113,7 @@ export default async function PlannerPage({
         }
       />
 
-      <div className="mb-4 flex items-center justify-between gap-2">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <Link href={`/planner?week=${addWeeks(week, -1)}`}>
           <Button variant="outline" size="sm">
             <ChevronLeft className="h-4 w-4" /> Prev
