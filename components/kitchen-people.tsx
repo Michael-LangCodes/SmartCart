@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DIET_TYPES, dietLabel, formatAllergies } from "@/lib/diet";
+import { FavoriteMealsSelect } from "@/components/favorite-meals-select";
 import type { KitchenPerson } from "@/lib/types";
 
 type RecipeOption = { id: string; title: string };
@@ -32,6 +33,11 @@ function PersonFields({
   const favByPos = new Map(
     (person?.favorites ?? []).map((f) => [f.position, f.recipe_id]),
   );
+  const initialIds: [string, string, string] = [
+    favByPos.get(1) ?? "",
+    favByPos.get(2) ?? "",
+    favByPos.get(3) ?? "",
+  ];
 
   return (
     <>
@@ -93,24 +99,11 @@ function PersonFields({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label>Top 3 favorite meals</Label>
-        {[1, 2, 3].map((pos) => (
-          <select
-            key={pos}
-            name={`fav_${pos}`}
-            defaultValue={favByPos.get(pos) ?? ""}
-            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-          >
-            <option value="">#{pos} — None</option>
-            {recipes.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.title}
-              </option>
-            ))}
-          </select>
-        ))}
-      </div>
+      <FavoriteMealsSelect
+        recipes={recipes}
+        initialIds={initialIds}
+        compact
+      />
     </>
   );
 }

@@ -11,12 +11,14 @@ import {
 
 export type ProfileState = { error?: string; message?: string };
 
-function parseFavoriteIds(formData: FormData): string[] {
+function parseFavoriteIds(formData: FormData): string[] | { error: string } {
   const ids = ["fav_1", "fav_2", "fav_3"]
     .map((key) => String(formData.get(key) ?? "").trim())
     .filter(Boolean);
-  // Deduplicate while preserving order.
-  return Array.from(new Set(ids)).slice(0, 3);
+  if (new Set(ids).size !== ids.length) {
+    return { error: "Each favorite meal can only be selected once." };
+  }
+  return ids.slice(0, 3);
 }
 
 export async function updateProfile(
@@ -36,7 +38,9 @@ export async function updateProfile(
   const serving_multiplier = parseServingMultiplier(
     String(formData.get("serving_multiplier") ?? "1"),
   );
-  const favorites = parseFavoriteIds(formData);
+  const favoritesResult = parseFavoriteIds(formData);
+  if ("error" in favoritesResult) return favoritesResult;
+  const favorites = favoritesResult;
 
   const { error } = await supabase
     .from("profiles")

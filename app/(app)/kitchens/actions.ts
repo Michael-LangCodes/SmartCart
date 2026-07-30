@@ -114,14 +114,14 @@ export async function deleteKitchen(formData: FormData): Promise<void> {
   revalidatePath("/kitchens");
 }
 
-function parseFavoriteIds(formData: FormData): string[] {
-  return Array.from(
-    new Set(
-      ["fav_1", "fav_2", "fav_3"]
-        .map((key) => String(formData.get(key) ?? "").trim())
-        .filter(Boolean),
-    ),
-  ).slice(0, 3);
+function parseFavoriteIds(formData: FormData): string[] | { error: string } {
+  const ids = ["fav_1", "fav_2", "fav_3"]
+    .map((key) => String(formData.get(key) ?? "").trim())
+    .filter(Boolean);
+  if (new Set(ids).size !== ids.length) {
+    return { error: "Each favorite meal can only be selected once." };
+  }
+  return ids.slice(0, 3);
 }
 
 export type PersonState = { error?: string };
@@ -142,7 +142,9 @@ export async function addKitchenPerson(
     String(formData.get("serving_multiplier") ?? "1"),
   );
   const notes = String(formData.get("notes") ?? "").trim() || null;
-  const favorites = parseFavoriteIds(formData);
+  const favoritesResult = parseFavoriteIds(formData);
+  if ("error" in favoritesResult) return favoritesResult;
+  const favorites = favoritesResult;
 
   const supabase = await createClient();
   const {
@@ -194,7 +196,9 @@ export async function updateKitchenPerson(
     String(formData.get("serving_multiplier") ?? "1"),
   );
   const notes = String(formData.get("notes") ?? "").trim() || null;
-  const favorites = parseFavoriteIds(formData);
+  const favoritesResult = parseFavoriteIds(formData);
+  if ("error" in favoritesResult) return favoritesResult;
+  const favorites = favoritesResult;
 
   const supabase = await createClient();
   const {

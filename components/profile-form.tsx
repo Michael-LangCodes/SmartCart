@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DIET_TYPES } from "@/lib/diet";
+import { FavoriteMealsSelect } from "@/components/favorite-meals-select";
 
 type RecipeOption = { id: string; title: string };
 
@@ -86,26 +87,7 @@ export function ProfileForm({
         </p>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <Label>Top 3 favorite meals</Label>
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-zinc-500">#{i + 1}</span>
-            <select
-              name={`fav_${i + 1}`}
-              defaultValue={favoriteIds[i] ?? ""}
-              className="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            >
-              <option value="">— None —</option>
-              {recipes.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
+      <FavoriteMealsSelect recipes={recipes} initialIds={favoriteIds} />
 
       {state.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
