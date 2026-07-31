@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/page-header";
 import { RecipeTagBadges } from "@/components/recipe-tags";
 import { RecipeOriginBadge } from "@/components/recipe-origin-badge";
+import { RecipeNutrition } from "@/components/recipe-nutrition";
 import { recipeTimingLine } from "@/lib/recipe-meta";
 import { deleteRecipe, cloneRecipe } from "@/app/(app)/recipes/actions";
 import type { Recipe, RecipeOrigin } from "@/lib/types";
@@ -279,6 +280,7 @@ export function RecipeCatalog({
                     {recipeTimingLine(recipe)}
                   </p>
                 )}
+                <RecipeNutrition recipe={recipe} />
                 <RecipeTagBadges
                   tags={recipe.tags}
                   onTagClick={toggleTag}

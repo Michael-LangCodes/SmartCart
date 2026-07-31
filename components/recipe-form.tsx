@@ -131,6 +131,75 @@ export function RecipeForm({ recipe }: { recipe?: RecipeWithIngredients }) {
         </div>
 
         <RecipeTagsField initialTags={recipe?.tags ?? []} />
+
+        <div className="sm:col-span-2">
+          <p className="mb-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+            Estimated nutrition{" "}
+            <span className="font-normal text-zinc-500">(per serving)</span>
+          </p>
+          <div className="grid gap-3 sm:grid-cols-5">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="calories">Calories</Label>
+              <Input
+                id="calories"
+                name="calories"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={recipe?.calories ?? ""}
+                placeholder="420"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="protein_g">Protein (g)</Label>
+              <Input
+                id="protein_g"
+                name="protein_g"
+                type="number"
+                min={0}
+                step={0.1}
+                defaultValue={recipe?.protein_g ?? ""}
+                placeholder="28"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="carbs_g">Carbs (g)</Label>
+              <Input
+                id="carbs_g"
+                name="carbs_g"
+                type="number"
+                min={0}
+                step={0.1}
+                defaultValue={recipe?.carbs_g ?? ""}
+                placeholder="45"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="fat_g">Fat (g)</Label>
+              <Input
+                id="fat_g"
+                name="fat_g"
+                type="number"
+                min={0}
+                step={0.1}
+                defaultValue={recipe?.fat_g ?? ""}
+                placeholder="12"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="fiber_g">Fiber (g)</Label>
+              <Input
+                id="fiber_g"
+                name="fiber_g"
+                type="number"
+                min={0}
+                step={0.1}
+                defaultValue={recipe?.fiber_g ?? ""}
+                placeholder="4"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">

@@ -78,3 +78,41 @@ export function recipeTimingLine(recipe: {
   if (cook) parts.push(`cook ${cook}`);
   return parts.join(" · ");
 }
+
+function fmtMacro(n: number | null | undefined): string | null {
+  if (n === null || n === undefined || !Number.isFinite(Number(n))) return null;
+  const v = Number(n);
+  return Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, "");
+}
+
+/** Compact nutrition line, e.g. "420 kcal · 28g protein · 35g carbs · 12g fat". */
+export function recipeNutritionLine(recipe: {
+  calories?: number | null;
+  protein_g?: number | null;
+  carbs_g?: number | null;
+  fat_g?: number | null;
+  fiber_g?: number | null;
+}): string {
+  const parts: string[] = [];
+  const cal = fmtMacro(recipe.calories);
+  if (cal) parts.push(`${cal} kcal`);
+  const protein = fmtMacro(recipe.protein_g);
+  if (protein) parts.push(`${protein}g protein`);
+  const carbs = fmtMacro(recipe.carbs_g);
+  if (carbs) parts.push(`${carbs}g carbs`);
+  const fat = fmtMacro(recipe.fat_g);
+  if (fat) parts.push(`${fat}g fat`);
+  const fiber = fmtMacro(recipe.fiber_g);
+  if (fiber) parts.push(`${fiber}g fiber`);
+  return parts.join(" · ");
+}
+
+export function hasNutrition(recipe: {
+  calories?: number | null;
+  protein_g?: number | null;
+  carbs_g?: number | null;
+  fat_g?: number | null;
+  fiber_g?: number | null;
+}): boolean {
+  return Boolean(recipeNutritionLine(recipe));
+}

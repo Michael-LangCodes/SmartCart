@@ -19,6 +19,13 @@ function parseOptionalInt(raw: string): number | null {
   return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
 }
 
+function parseOptionalNumber(raw: string): number | null {
+  const trimmed = raw.trim();
+  if (trimmed === "") return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
 function parseIngredients(formData: FormData): ParsedIngredient[] {
   const names = formData.getAll("ing_name").map(String);
   const quantities = formData.getAll("ing_qty").map(String);
@@ -63,6 +70,13 @@ export async function saveRecipe(formData: FormData): Promise<void> {
   const cook_minutes = parseOptionalInt(
     String(formData.get("cook_minutes") ?? ""),
   );
+  const calories = parseOptionalNumber(String(formData.get("calories") ?? ""));
+  const protein_g = parseOptionalNumber(
+    String(formData.get("protein_g") ?? ""),
+  );
+  const carbs_g = parseOptionalNumber(String(formData.get("carbs_g") ?? ""));
+  const fat_g = parseOptionalNumber(String(formData.get("fat_g") ?? ""));
+  const fiber_g = parseOptionalNumber(String(formData.get("fiber_g") ?? ""));
   const isPublic = formData.get("is_public") === "on";
   const tags = parseTags(String(formData.get("tags") ?? ""));
   const ingredients = parseIngredients(formData);
@@ -77,6 +91,11 @@ export async function saveRecipe(formData: FormData): Promise<void> {
     difficulty,
     prep_minutes,
     cook_minutes,
+    calories,
+    protein_g,
+    carbs_g,
+    fat_g,
+    fiber_g,
     tags,
     is_public: isPublic,
   };
@@ -161,6 +180,11 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
       difficulty: source.difficulty,
       prep_minutes: source.prep_minutes,
       cook_minutes: source.cook_minutes,
+      calories: source.calories,
+      protein_g: source.protein_g,
+      carbs_g: source.carbs_g,
+      fat_g: source.fat_g,
+      fiber_g: source.fiber_g,
       tags: source.tags ?? [],
       origin: "cookbook",
       source_recipe_id: source.id,

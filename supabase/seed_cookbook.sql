@@ -57,7 +57,8 @@ end $$;
 -- ---------------------------------------------------------------------------
 insert into public.recipes (
   id, owner_id, title, description, instructions, servings,
-  difficulty, prep_minutes, cook_minutes, tags, origin, is_public
+  difficulty, prep_minutes, cook_minutes, tags, origin, is_public,
+  calories, protein_g, carbs_g, fat_g, fiber_g
 ) values
 (
   'b0000000-0000-4000-8000-000000000001',
@@ -69,7 +70,8 @@ insert into public.recipes (
   'medium', 15, 35,
   array['comfort food', 'high protein'],
   'cookbook',
-  true
+  true,
+  520, 32, 58, 16, 5
 ),
 (
   'b0000000-0000-4000-8000-000000000002',
@@ -81,7 +83,8 @@ insert into public.recipes (
   'easy', 15, 15,
   array['quick', 'high protein', 'healthy'],
   'cookbook',
-  true
+  true,
+  380, 34, 28, 12, 4
 ),
 (
   'b0000000-0000-4000-8000-000000000003',
@@ -93,7 +96,8 @@ insert into public.recipes (
   'easy', 5, 0,
   array['meal prep', 'healthy', 'vegetarian'],
   'cookbook',
-  true
+  true,
+  340, 14, 48, 10, 8
 ),
 (
   'b0000000-0000-4000-8000-000000000004',
@@ -105,7 +109,8 @@ insert into public.recipes (
   'easy', 10, 0,
   array['quick', 'vegetarian', 'healthy'],
   'cookbook',
-  true
+  true,
+  220, 12, 8, 16, 2
 ),
 (
   'b0000000-0000-4000-8000-000000000005',
@@ -117,7 +122,8 @@ insert into public.recipes (
   'easy', 10, 30,
   array['healthy', 'high protein', 'meal prep'],
   'cookbook',
-  true
+  true,
+  450, 36, 32, 18, 5
 ),
 (
   'b0000000-0000-4000-8000-000000000006',
@@ -129,7 +135,8 @@ insert into public.recipes (
   'easy', 10, 10,
   array['vegetarian', 'budget', 'quick', 'kid-friendly'],
   'cookbook',
-  true
+  true,
+  360, 16, 48, 12, 12
 ),
 (
   'b0000000-0000-4000-8000-000000000007',
@@ -141,7 +148,8 @@ insert into public.recipes (
   'easy', 15, 30,
   array['vegan', 'healthy', 'budget', 'meal prep'],
   'cookbook',
-  true
+  true,
+  180, 6, 28, 5, 6
 ),
 (
   'b0000000-0000-4000-8000-000000000008',
@@ -153,7 +161,8 @@ insert into public.recipes (
   'easy', 10, 15,
   array['kid-friendly', 'vegetarian', 'comfort food'],
   'cookbook',
-  true
+  true,
+  310, 9, 48, 10, 3
 )
 on conflict (id) do update set
   title = excluded.title,
@@ -165,6 +174,11 @@ on conflict (id) do update set
   cook_minutes = excluded.cook_minutes,
   tags = excluded.tags,
   origin = excluded.origin,
+  calories = excluded.calories,
+  protein_g = excluded.protein_g,
+  carbs_g = excluded.carbs_g,
+  fat_g = excluded.fat_g,
+  fiber_g = excluded.fiber_g,
   is_public = true,
   owner_id = excluded.owner_id;
 
