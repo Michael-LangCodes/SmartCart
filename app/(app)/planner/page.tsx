@@ -159,72 +159,84 @@ export default async function PlannerPage({
 
       <div className="overflow-x-auto">
         <div className="min-w-[820px]">
-          {/* Header row */}
-          <div className="grid grid-cols-[90px_repeat(7,1fr)] gap-2">
+          {/*
+            One shared grid so every day column (header + breakfast/lunch/dinner)
+            uses the same track width. minmax(0, 1fr) keeps content from stretching
+            columns past an equal share of the row.
+          */}
+          <div className="grid grid-cols-[90px_repeat(7,minmax(0,1fr))] gap-2">
             <div />
             {DAYS.map((day, i) => (
               <div
                 key={day}
-                className="rounded-md bg-zinc-100 px-2 py-1.5 text-center text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                className="min-w-0 rounded-md bg-zinc-100 px-2 py-1.5 text-center text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
               >
-                {day.slice(0, 3)}{" "}
-                <span className="font-normal text-zinc-400">{dayDates[i]}</span>
+                <span className="block truncate">
+                  {day.slice(0, 3)}{" "}
+                  <span className="font-normal text-zinc-400">
+                    {dayDates[i]}
+                  </span>
+                </span>
+              </div>
+            ))}
+
+            {MEAL_TYPES.map((mealType) => (
+              <div key={mealType} className="contents">
+                <div className="flex items-center text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  {mealType}
+                </div>
+                {DAYS.map((_, dayIdx) => {
+                  const slotEntries =
+                    bySlot.get(`${dayIdx}_${mealType}`) ?? [];
+                  return (
+                    <div
+                      key={`${mealType}-${dayIdx}`}
+                      className="flex min-h-[72px] min-w-0 flex-col overflow-hidden rounded-md border border-zinc-200 bg-white p-1.5 dark:border-zinc-800 dark:bg-zinc-900"
+                    >
+                      <div className="flex min-w-0 flex-col gap-1">
+                        {slotEntries.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="flex min-w-0 items-center justify-between gap-1 rounded bg-emerald-50 px-1.5 py-1 text-xs text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
+                          >
+                            <span className="min-w-0 truncate">
+                              {entry.recipes?.title ?? "Recipe"}
+                            </span>
+                            <form
+                              action={removeMealEntry}
+                              className="shrink-0"
+                            >
+                              <input
+                                type="hidden"
+                                name="entryId"
+                                value={entry.id}
+                              />
+                              <button
+                                type="submit"
+                                className="text-emerald-500 hover:text-red-600"
+                                title="Remove"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </form>
+                          </div>
+                        ))}
+                      </div>
+                      {recipes.length > 0 && (
+                        <AddMeal
+                          kitchenId={activeKitchen.id}
+                          week={week}
+                          day={dayIdx}
+                          mealType={mealType}
+                          recipes={recipes}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
-
-          {/* Meal rows */}
-          {MEAL_TYPES.map((mealType) => (
-            <div
-              key={mealType}
-              className="mt-2 grid grid-cols-[90px_repeat(7,1fr)] gap-2"
-            >
-              <div className="flex items-center text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {mealType}
-              </div>
-              {DAYS.map((_, dayIdx) => {
-                const slotEntries = bySlot.get(`${dayIdx}_${mealType}`) ?? [];
-                return (
-                  <div
-                    key={dayIdx}
-                    className="min-h-[72px] rounded-md border border-zinc-200 bg-white p-1.5 dark:border-zinc-800 dark:bg-zinc-900"
-                  >
-                    <div className="flex flex-col gap-1">
-                      {slotEntries.map((entry) => (
-                        <div
-                          key={entry.id}
-                          className="flex items-center justify-between gap-1 rounded bg-emerald-50 px-1.5 py-1 text-xs text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
-                        >
-                          <span className="truncate">
-                            {entry.recipes?.title ?? "Recipe"}
-                          </span>
-                          <form action={removeMealEntry}>
-                            <input type="hidden" name="entryId" value={entry.id} />
-                            <button
-                              type="submit"
-                              className="text-emerald-500 hover:text-red-600"
-                              title="Remove"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </form>
-                        </div>
-                      ))}
-                    </div>
-                    {recipes.length > 0 && (
-                      <AddMeal
-                        kitchenId={activeKitchen.id}
-                        week={week}
-                        day={dayIdx}
-                        mealType={mealType}
-                        recipes={recipes}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
         </div>
       </div>
     </div>

@@ -110,17 +110,17 @@ export function AddMeal({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-1 flex w-full items-center gap-1 rounded-md border border-dashed border-zinc-300 px-2 py-1 text-xs text-zinc-400 hover:border-emerald-400 hover:text-emerald-600 dark:border-zinc-700"
+        className="mt-1 flex w-full min-w-0 items-center gap-1 rounded-md border border-dashed border-zinc-300 px-2 py-1 text-xs text-zinc-400 hover:border-emerald-400 hover:text-emerald-600 dark:border-zinc-700"
       >
-        <Plus className="h-3 w-3" />
-        Add recipe
+        <Plus className="h-3 w-3 shrink-0" />
+        <span className="truncate">Add recipe</span>
       </button>
     );
   }
 
   return (
-    <div ref={rootRef} className="relative mt-1">
-      <div className="flex items-center gap-1 rounded-md border border-emerald-400 bg-white px-1.5 py-1 dark:bg-zinc-900">
+    <div ref={rootRef} className="relative mt-1 min-w-0">
+      <div className="flex min-w-0 items-center gap-1 rounded-md border border-emerald-400 bg-white px-1.5 py-1 dark:bg-zinc-900">
         <Search className="h-3 w-3 shrink-0 text-zinc-400" />
         <input
           ref={inputRef}
