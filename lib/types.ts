@@ -59,6 +59,31 @@ export type RecipeWithIngredients = Recipe & {
   recipe_ingredients: RecipeIngredient[];
 };
 
+export type RecipeRating = {
+  recipe_id: string;
+  user_id: string;
+  rating: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RecipeComment = {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+};
+
+export type RecipeCommentWithAuthor = RecipeComment & {
+  author_name: string;
+};
+
+export type RecipeRatingSummary = {
+  average: number;
+  count: number;
+};
+
 export type Kitchen = {
   id: string;
   name: string;

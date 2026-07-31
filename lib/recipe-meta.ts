@@ -79,7 +79,8 @@ export function recipeTimingLine(recipe: {
   return parts.join(" · ");
 }
 
-function fmtMacro(n: number | null | undefined): string | null {
+/** Format a macro number for display (drops trailing .0). */
+export function formatMacro(n: number | null | undefined): string | null {
   if (n === null || n === undefined || !Number.isFinite(Number(n))) return null;
   const v = Number(n);
   return Number.isInteger(v) ? String(v) : v.toFixed(1).replace(/\.0$/, "");
@@ -94,15 +95,15 @@ export function recipeNutritionLine(recipe: {
   fiber_g?: number | null;
 }): string {
   const parts: string[] = [];
-  const cal = fmtMacro(recipe.calories);
+  const cal = formatMacro(recipe.calories);
   if (cal) parts.push(`${cal} kcal`);
-  const protein = fmtMacro(recipe.protein_g);
+  const protein = formatMacro(recipe.protein_g);
   if (protein) parts.push(`${protein}g protein`);
-  const carbs = fmtMacro(recipe.carbs_g);
+  const carbs = formatMacro(recipe.carbs_g);
   if (carbs) parts.push(`${carbs}g carbs`);
-  const fat = fmtMacro(recipe.fat_g);
+  const fat = formatMacro(recipe.fat_g);
   if (fat) parts.push(`${fat}g fat`);
-  const fiber = fmtMacro(recipe.fiber_g);
+  const fiber = formatMacro(recipe.fiber_g);
   if (fiber) parts.push(`${fiber}g fiber`);
   return parts.join(" · ");
 }

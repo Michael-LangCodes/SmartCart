@@ -2,21 +2,31 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { CopyPlus, Pencil, Trash2, Globe, Lock, Utensils } from "lucide-react";
+import {
+  CopyPlus,
+  Pencil,
+  Trash2,
+  Globe,
+  Lock,
+  Utensils,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/page-header";
 import { RecipeTagBadges } from "@/components/recipe-tags";
 import { RecipeOriginBadge } from "@/components/recipe-origin-badge";
 import { RecipeNutrition } from "@/components/recipe-nutrition";
+import { StarRatingDisplay } from "@/components/recipe-stars";
 import { recipeTimingLine } from "@/lib/recipe-meta";
 import { deleteRecipe, cloneRecipe } from "@/app/(app)/recipes/actions";
-import type { Recipe, RecipeOrigin } from "@/lib/types";
+import type { Recipe, RecipeOrigin, RecipeRatingSummary } from "@/lib/types";
 
 type RecipeCard = Recipe & {
   recipe_ingredients: { count: number }[];
+  ratingSummary?: RecipeRatingSummary;
 };
 
-type SortMode = "newest" | "title" | "tags";
+type SortMode = "newest" | "title" | "tags" | "rating";
 type OriginFilter = "all" | RecipeOrigin;
 
 function collectTags(recipes: RecipeCard[]): string[] {
@@ -69,6 +79,16 @@ export function RecipeCatalog({
         const at = (a.tags ?? []).slice().sort().join(",");
         const bt = (b.tags ?? []).slice().sort().join(",");
         if (at !== bt) return at.localeCompare(bt);
+        return a.title.localeCompare(b.title);
+      });
+    } else if (sort === "rating") {
+      sorted.sort((a, b) => {
+        const ar = a.ratingSummary?.average ?? 0;
+        const br = b.ratingSummary?.average ?? 0;
+        if (br !== ar) return br - ar;
+        const ac = a.ratingSummary?.count ?? 0;
+        const bc = b.ratingSummary?.count ?? 0;
+        if (bc !== ac) return bc - ac;
         return a.title.localeCompare(b.title);
       });
     } else {
@@ -147,6 +167,9 @@ export function RecipeCatalog({
               <option value="newest">Newest</option>
               <option value="title">Title A–Z</option>
               <option value="tags">Tags A–Z</option>
+              {mode === "cookbook" && (
+                <option value="rating">Highest rated</option>
+              )}
             </select>
           </div>
         </div>
@@ -281,6 +304,18 @@ export function RecipeCatalog({
                   </p>
                 )}
                 <RecipeNutrition recipe={recipe} />
+                {mode === "cookbook" && (
+                  <div className="mt-2">
+                    {recipe.ratingSummary && recipe.ratingSummary.count > 0 ? (
+                      <StarRatingDisplay
+                        value={recipe.ratingSummary.average}
+                        count={recipe.ratingSummary.count}
+                      />
+                    ) : (
+                      <p className="text-xs text-zinc-400">No ratings yet</p>
+                    )}
+                  </div>
+                )}
                 <RecipeTagBadges
                   tags={recipe.tags}
                   onTagClick={toggleTag}
@@ -307,17 +342,25 @@ export function RecipeCatalog({
                     </form>
                   </div>
                 ) : (
-                  <form action={cloneRecipe} className="mt-4">
-                    <input type="hidden" name="id" value={recipe.id} />
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                    >
-                      <CopyPlus className="h-4 w-4" /> Add to my recipes
-                    </Button>
-                  </form>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link href={`/cookbook/${recipe.id}`}>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <MessageSquare className="h-4 w-4" />
+                        View & review
+                      </Button>
+                    </Link>
+                    <form action={cloneRecipe}>
+                      <input type="hidden" name="id" value={recipe.id} />
+                      <Button
+                        type="submit"
+                        variant="ghost"
+                        size="sm"
+                        className="w-full"
+                      >
+                        <CopyPlus className="h-4 w-4" /> Add to my recipes
+                      </Button>
+                    </form>
+                  </div>
                 )}
               </div>
             );

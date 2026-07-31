@@ -23,7 +23,15 @@ type EntryRow = {
   id: string;
   day_of_week: number;
   meal_type: string;
-  recipes: { id: string; title: string } | null;
+  recipes: {
+    id: string;
+    title: string;
+    calories: number | null;
+    protein_g: number | null;
+    carbs_g: number | null;
+    fat_g: number | null;
+    fiber_g: number | null;
+  } | null;
 };
 
 export default async function PlannerPage({
@@ -71,7 +79,9 @@ export default async function PlannerPage({
   if (mealPlan) {
     const { data } = await supabase
       .from("meal_plan_entries")
-      .select("id, day_of_week, meal_type, recipes(id, title)")
+      .select(
+        "id, day_of_week, meal_type, recipes(id, title, calories, protein_g, carbs_g, fat_g, fiber_g)",
+      )
       .eq("meal_plan_id", mealPlan.id);
     entries = (data ?? []) as unknown as EntryRow[];
   }

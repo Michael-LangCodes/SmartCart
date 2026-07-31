@@ -66,6 +66,7 @@ Run the two migration files, in order, in the Supabase **SQL Editor**
 5. `supabase/migrations/0005_recipe_tags.sql` - recipe tags (healthy, high protein, etc.)
 6. `supabase/migrations/0006_recipe_origin.sql` - distinguish user-created vs cookbook recipes
 7. `supabase/migrations/0007_recipe_nutrition.sql` - estimated nutrition facts per serving
+8. `supabase/migrations/0008_recipe_ratings_comments.sql` - ratings and comments on shared cookbook recipes
 
 Using the [Supabase CLI](https://supabase.com/docs/guides/cli):
 
