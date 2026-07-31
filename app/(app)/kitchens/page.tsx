@@ -39,7 +39,15 @@ export default async function KitchensPage() {
   const membersByKitchen = new Map<string, KitchenMember[]>();
   const profileById = new Map<
     string,
-    Pick<Profile, "display_name" | "allergies" | "diet_type" | "serving_multiplier">
+    Pick<
+      Profile,
+      | "display_name"
+      | "allergies"
+      | "diet_type"
+      | "serving_multiplier"
+      | "target_calories"
+      | "target_protein_g"
+    >
   >();
   const peopleByKitchen = new Map<
     string,
@@ -72,7 +80,9 @@ export default async function KitchensPage() {
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name, allergies, diet_type, serving_multiplier")
+        .select(
+          "id, display_name, allergies, diet_type, serving_multiplier, target_calories, target_protein_g",
+        )
         .in("id", userIds);
       for (const p of profiles ?? []) {
         profileById.set(p.id, p);
@@ -206,6 +216,12 @@ export default async function KitchensPage() {
                                 {p.serving_multiplier} servings
                                 {p.allergies?.length
                                   ? ` · ${formatAllergies(p.allergies)}`
+                                  : ""}
+                                {p.target_calories != null
+                                  ? ` · ${Number(p.target_calories)} kcal/day`
+                                  : ""}
+                                {p.target_protein_g != null
+                                  ? ` · ${Number(p.target_protein_g)}g protein`
                                   : ""}
                               </p>
                             )}

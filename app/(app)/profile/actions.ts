@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   isDietType,
   parseAllergies,
+  parseOptionalTarget,
   parseServingMultiplier,
 } from "@/lib/diet";
 
@@ -38,6 +39,26 @@ export async function updateProfile(
   const serving_multiplier = parseServingMultiplier(
     String(formData.get("serving_multiplier") ?? "1"),
   );
+  const target_calories = parseOptionalTarget(
+    String(formData.get("target_calories") ?? ""),
+    20000,
+  );
+  const target_protein_g = parseOptionalTarget(
+    String(formData.get("target_protein_g") ?? ""),
+    1000,
+  );
+  const target_carbs_g = parseOptionalTarget(
+    String(formData.get("target_carbs_g") ?? ""),
+    2000,
+  );
+  const target_fat_g = parseOptionalTarget(
+    String(formData.get("target_fat_g") ?? ""),
+    1000,
+  );
+  const target_fiber_g = parseOptionalTarget(
+    String(formData.get("target_fiber_g") ?? ""),
+    200,
+  );
   const favoritesResult = parseFavoriteIds(formData);
   if ("error" in favoritesResult) return favoritesResult;
   const favorites = favoritesResult;
@@ -49,6 +70,11 @@ export async function updateProfile(
       diet_type,
       allergies,
       serving_multiplier,
+      target_calories,
+      target_protein_g,
+      target_carbs_g,
+      target_fat_g,
+      target_fiber_g,
     })
     .eq("id", user.id);
 
@@ -75,5 +101,6 @@ export async function updateProfile(
 
   revalidatePath("/profile");
   revalidatePath("/kitchens");
+  revalidatePath("/planner");
   return { message: "Profile saved." };
 }

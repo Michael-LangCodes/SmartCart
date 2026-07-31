@@ -14,7 +14,9 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, allergies, diet_type, serving_multiplier")
+    .select(
+      "display_name, allergies, diet_type, serving_multiplier, target_calories, target_protein_g, target_carbs_g, target_fat_g, target_fiber_g",
+    )
     .eq("id", user!.id)
     .maybeSingle();
 
@@ -43,13 +45,33 @@ export default async function ProfilePage() {
     <div className="mx-auto max-w-xl">
       <PageHeader
         title="Your profile"
-        description="Diet preferences, allergies, portion size, and favorite meals. Kitchen members can see these when planning."
+        description="Diet preferences, allergies, portion size, nutrition targets, and favorite meals. Kitchen members can see these when planning."
       />
       <ProfileForm
         displayName={profile?.display_name ?? ""}
         dietType={(profile?.diet_type as DietType) ?? "all"}
         allergies={formatAllergies(profile?.allergies)}
         servingMultiplier={Number(profile?.serving_multiplier ?? 1)}
+        macroTargets={{
+          target_calories:
+            profile?.target_calories != null
+              ? Number(profile.target_calories)
+              : null,
+          target_protein_g:
+            profile?.target_protein_g != null
+              ? Number(profile.target_protein_g)
+              : null,
+          target_carbs_g:
+            profile?.target_carbs_g != null
+              ? Number(profile.target_carbs_g)
+              : null,
+          target_fat_g:
+            profile?.target_fat_g != null ? Number(profile.target_fat_g) : null,
+          target_fiber_g:
+            profile?.target_fiber_g != null
+              ? Number(profile.target_fiber_g)
+              : null,
+        }}
         favoriteIds={favoriteIds}
         recipes={(recipeRows ?? []) as { id: string; title: string }[]}
       />

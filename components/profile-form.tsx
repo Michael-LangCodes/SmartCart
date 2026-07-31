@@ -6,18 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { DIET_TYPES } from "@/lib/diet";
+import { DIET_TYPES, type MacroTargets } from "@/lib/diet";
 import { FavoriteMealsSelect } from "@/components/favorite-meals-select";
 
 type RecipeOption = { id: string; title: string };
 
 const initial: ProfileState = {};
 
+function targetDefault(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(Number(n))) return "";
+  return String(n);
+}
+
 export function ProfileForm({
   displayName,
   dietType,
   allergies,
   servingMultiplier,
+  macroTargets,
   favoriteIds,
   recipes,
 }: {
@@ -25,6 +31,7 @@ export function ProfileForm({
   dietType: string;
   allergies: string;
   servingMultiplier: number;
+  macroTargets: MacroTargets;
   favoriteIds: [string, string, string];
   recipes: RecipeOption[];
 }) {
@@ -86,6 +93,77 @@ export function ProfileForm({
           larger (e.g. 1.5).
         </p>
       </div>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+          Daily nutrition targets
+        </legend>
+        <p className="text-xs text-zinc-500">
+          Optional goals used in the weekly planner summary. Leave blank to skip.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="target_calories">Calories (kcal)</Label>
+            <Input
+              id="target_calories"
+              name="target_calories"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={targetDefault(macroTargets.target_calories)}
+              placeholder="2000"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="target_protein_g">Protein (g)</Label>
+            <Input
+              id="target_protein_g"
+              name="target_protein_g"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={targetDefault(macroTargets.target_protein_g)}
+              placeholder="120"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="target_carbs_g">Carbs (g)</Label>
+            <Input
+              id="target_carbs_g"
+              name="target_carbs_g"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={targetDefault(macroTargets.target_carbs_g)}
+              placeholder="200"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="target_fat_g">Fat (g)</Label>
+            <Input
+              id="target_fat_g"
+              name="target_fat_g"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={targetDefault(macroTargets.target_fat_g)}
+              placeholder="65"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5 sm:col-span-2 sm:max-w-[calc(50%-0.375rem)]">
+            <Label htmlFor="target_fiber_g">Fiber (g)</Label>
+            <Input
+              id="target_fiber_g"
+              name="target_fiber_g"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={targetDefault(macroTargets.target_fiber_g)}
+              placeholder="30"
+            />
+          </div>
+        </div>
+      </fieldset>
 
       <FavoriteMealsSelect recipes={recipes} initialIds={favoriteIds} />
 

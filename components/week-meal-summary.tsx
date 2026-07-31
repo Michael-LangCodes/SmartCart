@@ -1,5 +1,6 @@
 import { DAYS, MEAL_TYPES } from "@/lib/utils";
 import { formatMacro, hasNutrition } from "@/lib/recipe-meta";
+import { hasMacroTargets, type MacroTargets } from "@/lib/diet";
 
 type RecipeNutrition = {
   id: string;
@@ -84,15 +85,69 @@ function MacroStat({
   );
 }
 
+function TargetProgress({
+  label,
+  actual,
+  target,
+  unit,
+}: {
+  label: string;
+  actual: number;
+  target: number | null;
+  unit: string;
+}) {
+  if (target === null || target <= 0) return null;
+  const pct = Math.min(150, Math.round((actual / target) * 100));
+  const over = actual > target * 1.05;
+  const under = actual < target * 0.9;
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
+        <span className="font-medium text-zinc-700 dark:text-zinc-300">
+          {label}
+        </span>
+        <span className="tabular-nums text-zinc-500 dark:text-zinc-400">
+          {formatMacro(Math.round(actual))} / {formatMacro(target)} {unit}
+          <span
+            className={
+              over
+                ? "ml-1 text-amber-700 dark:text-amber-300"
+                : under
+                  ? "ml-1 text-sky-700 dark:text-sky-300"
+                  : "ml-1 text-emerald-700 dark:text-emerald-300"
+            }
+          >
+            ({pct}%)
+          </span>
+        </span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <div
+          className={
+            over
+              ? "h-full rounded-full bg-amber-500"
+              : under
+                ? "h-full rounded-full bg-sky-500"
+                : "h-full rounded-full bg-emerald-600"
+          }
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 /** Readable list of every meal planned for the week, with nutrition highlights. */
 export function WeekMealSummary({
   entries,
   dayDates,
   weekLabel,
+  macroTargets,
 }: {
   entries: EntryRow[];
   dayDates: string[];
   weekLabel: string;
+  macroTargets?: MacroTargets | null;
 }) {
   const total = entries.length;
   const withNutrition = entries.filter((e) => hasNutrition(e.recipes));
@@ -237,6 +292,50 @@ export function WeekMealSummary({
                   {formatMacro(Math.round(weekTotals.fat_g / avgDays))}g fat
                 </p>
               </div>
+
+              {hasMacroTargets(macroTargets) && macroTargets && (
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    Vs your daily targets
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    <TargetProgress
+                      label="Calories"
+                      actual={weekTotals.calories / avgDays}
+                      target={macroTargets.target_calories}
+                      unit="kcal"
+                    />
+                    <TargetProgress
+                      label="Protein"
+                      actual={weekTotals.protein_g / avgDays}
+                      target={macroTargets.target_protein_g}
+                      unit="g"
+                    />
+                    <TargetProgress
+                      label="Carbs"
+                      actual={weekTotals.carbs_g / avgDays}
+                      target={macroTargets.target_carbs_g}
+                      unit="g"
+                    />
+                    <TargetProgress
+                      label="Fat"
+                      actual={weekTotals.fat_g / avgDays}
+                      target={macroTargets.target_fat_g}
+                      unit="g"
+                    />
+                    <TargetProgress
+                      label="Fiber"
+                      actual={weekTotals.fiber_g / avgDays}
+                      target={macroTargets.target_fiber_g}
+                      unit="g"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-zinc-400">
+                    Compares daily averages from planned meals to your profile
+                    targets.
+                  </p>
+                </div>
+              )}
 
               {macroShares && (
                 <div>

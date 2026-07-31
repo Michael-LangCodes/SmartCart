@@ -11,6 +11,12 @@ export type Profile = {
   allergies: string[];
   diet_type: DietType;
   serving_multiplier: number;
+  /** Daily targets (optional). */
+  target_calories: number | null;
+  target_protein_g: number | null;
+  target_carbs_g: number | null;
+  target_fat_g: number | null;
+  target_fiber_g: number | null;
   created_at: string;
 };
 

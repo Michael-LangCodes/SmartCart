@@ -86,16 +86,47 @@ export default async function PlannerPage({
     entries = (data ?? []) as unknown as EntryRow[];
   }
 
-  const { data: recipeRows } = await supabase
-    .from("recipes")
-    .select("id, title, origin")
-    .or(`owner_id.eq.${user!.id},is_public.eq.true`)
-    .order("title");
+  const [{ data: recipeRows }, { data: profile }] = await Promise.all([
+    supabase
+      .from("recipes")
+      .select("id, title, origin")
+      .or(`owner_id.eq.${user!.id},is_public.eq.true`)
+      .order("title"),
+    supabase
+      .from("profiles")
+      .select(
+        "target_calories, target_protein_g, target_carbs_g, target_fat_g, target_fiber_g",
+      )
+      .eq("id", user!.id)
+      .maybeSingle(),
+  ]);
   const recipes = (recipeRows ?? []) as {
     id: string;
     title: string;
     origin?: string | null;
   }[];
+  const macroTargets = profile
+    ? {
+        target_calories:
+          profile.target_calories != null
+            ? Number(profile.target_calories)
+            : null,
+        target_protein_g:
+          profile.target_protein_g != null
+            ? Number(profile.target_protein_g)
+            : null,
+        target_carbs_g:
+          profile.target_carbs_g != null
+            ? Number(profile.target_carbs_g)
+            : null,
+        target_fat_g:
+          profile.target_fat_g != null ? Number(profile.target_fat_g) : null,
+        target_fiber_g:
+          profile.target_fiber_g != null
+            ? Number(profile.target_fiber_g)
+            : null,
+      }
+    : null;
 
   const bySlot = new Map<string, EntryRow[]>();
   for (const e of entries) {
@@ -255,6 +286,7 @@ export default async function PlannerPage({
         entries={entries}
         dayDates={dayDates}
         weekLabel={formatWeekRange(week)}
+        macroTargets={macroTargets}
       />
     </div>
   );

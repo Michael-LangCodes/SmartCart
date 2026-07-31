@@ -8,7 +8,7 @@ SmartCart is a full-stack web app built with **Next.js (App Router) + Supabase**
 ## Features
 
 - **Accounts** - email/password auth with server-side sessions (Supabase Auth + `@supabase/ssr`), plus an optional open "guest" mode (anonymous sign-in) so you can use the app without an account. Toggle with `NEXT_PUBLIC_REQUIRE_AUTH`.
-- **Profile preferences** - allergies, eating type (all / vegetarian / vegan / …), serving-size multiplier, and top 3 favorite meals.
+- **Profile preferences** - allergies, eating type (all / vegetarian / vegan / …), serving-size multiplier, daily macro nutrition targets, and top 3 favorite meals.
 - **My Recipes** - create, edit and delete recipes with a dynamic list of ingredients.
 - **Cookbook** - mark a recipe public to share it, and clone anyone's public recipe into your own collection.
 - **Kitchens** - shared spaces you create or join with an invite code. Add household people without accounts (kids, guests) with their own diet prefs and favorites. Members plan and shop together.
@@ -69,6 +69,7 @@ Run the two migration files, in order, in the Supabase **SQL Editor**
 8. `supabase/migrations/0008_recipe_ratings_comments.sql` - ratings and comments on shared cookbook recipes
 9. `supabase/migrations/0009_recipe_personal_comments.sql` - private personal notes on My Recipes
 10. `supabase/migrations/0010_recipe_image.sql` - optional cover image URL for recipes
+11. `supabase/migrations/0011_profile_macro_targets.sql` - daily macro nutrition targets on member profiles
 
 Using the [Supabase CLI](https://supabase.com/docs/guides/cli):
 
