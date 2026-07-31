@@ -24,6 +24,7 @@ import type { Recipe, RecipeOrigin, RecipeRatingSummary } from "@/lib/types";
 type RecipeCard = Recipe & {
   recipe_ingredients: { count: number }[];
   ratingSummary?: RecipeRatingSummary;
+  personalCommentCount?: number;
 };
 
 type SortMode = "newest" | "title" | "tags" | "rating";
@@ -297,6 +298,12 @@ export function RecipeCatalog({
                 <p className="mt-2 text-xs text-zinc-400">
                   {count} ingredient{count === 1 ? "" : "s"}
                   {recipe.servings ? ` · serves ${recipe.servings}` : ""}
+                  {mode === "mine" &&
+                  (recipe.personalCommentCount ?? 0) > 0
+                    ? ` · ${recipe.personalCommentCount} note${
+                        recipe.personalCommentCount === 1 ? "" : "s"
+                      }`
+                    : ""}
                 </p>
                 {recipeTimingLine(recipe) && (
                   <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">

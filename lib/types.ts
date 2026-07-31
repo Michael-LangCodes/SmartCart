@@ -79,6 +79,15 @@ export type RecipeCommentWithAuthor = RecipeComment & {
   author_name: string;
 };
 
+/** Private notes on a recipe you own (My Recipes). */
+export type RecipePersonalComment = {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+};
+
 export type RecipeRatingSummary = {
   average: number;
   count: number;

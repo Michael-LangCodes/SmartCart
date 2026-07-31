@@ -215,3 +215,59 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
   revalidatePath("/recipes");
   redirect("/recipes");
 }
+
+/** Add a private personal note on a recipe you own. */
+export async function addPersonalRecipeComment(
+  formData: FormData,
+): Promise<void> {
+  const recipeId = String(formData.get("recipe_id") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  if (!recipeId || body.length < 1 || body.length > 2000) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: recipe } = await supabase
+    .from("recipes")
+    .select("id")
+    .eq("id", recipeId)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+  if (!recipe) return;
+
+  await supabase.from("recipe_personal_comments").insert({
+    recipe_id: recipeId,
+    user_id: user.id,
+    body,
+  });
+
+  revalidatePath("/recipes");
+  revalidatePath(`/recipes/${recipeId}`);
+}
+
+/** Delete one of your personal notes. */
+export async function deletePersonalRecipeComment(
+  formData: FormData,
+): Promise<void> {
+  const commentId = String(formData.get("comment_id") ?? "").trim();
+  const recipeId = String(formData.get("recipe_id") ?? "").trim();
+  if (!commentId) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase
+    .from("recipe_personal_comments")
+    .delete()
+    .eq("id", commentId)
+    .eq("user_id", user.id);
+
+  revalidatePath("/recipes");
+  if (recipeId) revalidatePath(`/recipes/${recipeId}`);
+}
