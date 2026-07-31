@@ -12,6 +12,7 @@ import {
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { AddMeal } from "@/components/add-meal";
+import { WeekMealSummary } from "@/components/week-meal-summary";
 import { removeMealEntry } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -239,6 +240,12 @@ export default async function PlannerPage({
           </div>
         </div>
       </div>
+
+      <WeekMealSummary
+        entries={entries}
+        dayDates={dayDates}
+        weekLabel={formatWeekRange(week)}
+      />
     </div>
   );
 }
