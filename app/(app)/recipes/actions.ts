@@ -77,6 +77,13 @@ export async function saveRecipe(formData: FormData): Promise<void> {
   const carbs_g = parseOptionalNumber(String(formData.get("carbs_g") ?? ""));
   const fat_g = parseOptionalNumber(String(formData.get("fat_g") ?? ""));
   const fiber_g = parseOptionalNumber(String(formData.get("fiber_g") ?? ""));
+  const imageRaw = String(formData.get("image_url") ?? "").trim();
+  const image_url =
+    imageRaw === ""
+      ? null
+      : /^https?:\/\//i.test(imageRaw) && imageRaw.length <= 2000
+        ? imageRaw
+        : null;
   const isPublic = formData.get("is_public") === "on";
   const tags = parseTags(String(formData.get("tags") ?? ""));
   const ingredients = parseIngredients(formData);
@@ -96,6 +103,7 @@ export async function saveRecipe(formData: FormData): Promise<void> {
     carbs_g,
     fat_g,
     fiber_g,
+    image_url,
     tags,
     is_public: isPublic,
   };
@@ -185,6 +193,7 @@ export async function cloneRecipe(formData: FormData): Promise<void> {
       carbs_g: source.carbs_g,
       fat_g: source.fat_g,
       fiber_g: source.fiber_g,
+      image_url: source.image_url,
       tags: source.tags ?? [],
       origin: "cookbook",
       source_recipe_id: source.id,

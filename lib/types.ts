@@ -42,6 +42,8 @@ export type Recipe = {
   carbs_g: number | null;
   fat_g: number | null;
   fiber_g: number | null;
+  /** Optional cover image (https URL). */
+  image_url: string | null;
   is_public: boolean;
   created_at: string;
 };

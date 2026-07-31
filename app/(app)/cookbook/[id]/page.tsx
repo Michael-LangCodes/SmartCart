@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { RecipeOriginBadge } from "@/components/recipe-origin-badge";
 import { RecipeNutrition } from "@/components/recipe-nutrition";
+import { RecipeImage } from "@/components/recipe-image";
 import { RecipeTagBadges } from "@/components/recipe-tags";
 import { CookbookReviews } from "@/components/cookbook-reviews";
 import { cloneRecipe } from "@/app/(app)/recipes/actions";
@@ -107,6 +108,13 @@ export default async function CookbookRecipePage({
       >
         <ArrowLeft className="h-4 w-4" /> Back to cookbook
       </Link>
+
+      <RecipeImage
+        src={typed.image_url}
+        alt={typed.title}
+        variant="hero"
+        className="mb-6 rounded-xl"
+      />
 
       <PageHeader
         title={typed.title}

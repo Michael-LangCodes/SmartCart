@@ -58,7 +58,7 @@ end $$;
 insert into public.recipes (
   id, owner_id, title, description, instructions, servings,
   difficulty, prep_minutes, cook_minutes, tags, origin, is_public,
-  calories, protein_g, carbs_g, fat_g, fiber_g
+  calories, protein_g, carbs_g, fat_g, fiber_g, image_url
 ) values
 (
   'b0000000-0000-4000-8000-000000000001',
@@ -71,7 +71,8 @@ insert into public.recipes (
   array['comfort food', 'high protein'],
   'cookbook',
   true,
-  520, 32, 58, 16, 5
+  520, 32, 58, 16, 5,
+  'https://images.unsplash.com/photo-1622973536968-3ead9e780960?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000002',
@@ -84,7 +85,8 @@ insert into public.recipes (
   array['quick', 'high protein', 'healthy'],
   'cookbook',
   true,
-  380, 34, 28, 12, 4
+  380, 34, 28, 12, 4,
+  'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000003',
@@ -97,7 +99,8 @@ insert into public.recipes (
   array['meal prep', 'healthy', 'vegetarian'],
   'cookbook',
   true,
-  340, 14, 48, 10, 8
+  340, 14, 48, 10, 8,
+  'https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000004',
@@ -110,7 +113,8 @@ insert into public.recipes (
   array['quick', 'vegetarian', 'healthy'],
   'cookbook',
   true,
-  220, 12, 8, 16, 2
+  220, 12, 8, 16, 2,
+  'https://images.unsplash.com/photo-1592419044706-39796d40f98c?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000005',
@@ -123,7 +127,8 @@ insert into public.recipes (
   array['healthy', 'high protein', 'meal prep'],
   'cookbook',
   true,
-  450, 36, 32, 18, 5
+  450, 36, 32, 18, 5,
+  'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000006',
@@ -136,7 +141,8 @@ insert into public.recipes (
   array['vegetarian', 'budget', 'quick', 'kid-friendly'],
   'cookbook',
   true,
-  360, 16, 48, 12, 12
+  360, 16, 48, 12, 12,
+  'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000007',
@@ -149,7 +155,8 @@ insert into public.recipes (
   array['vegan', 'healthy', 'budget', 'meal prep'],
   'cookbook',
   true,
-  180, 6, 28, 5, 6
+  180, 6, 28, 5, 6,
+  'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=80'
 ),
 (
   'b0000000-0000-4000-8000-000000000008',
@@ -162,7 +169,8 @@ insert into public.recipes (
   array['kid-friendly', 'vegetarian', 'comfort food'],
   'cookbook',
   true,
-  310, 9, 48, 10, 3
+  310, 9, 48, 10, 3,
+  'https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=80'
 )
 on conflict (id) do update set
   title = excluded.title,
@@ -179,6 +187,7 @@ on conflict (id) do update set
   carbs_g = excluded.carbs_g,
   fat_g = excluded.fat_g,
   fiber_g = excluded.fiber_g,
+  image_url = excluded.image_url,
   is_public = true,
   owner_id = excluded.owner_id;
 

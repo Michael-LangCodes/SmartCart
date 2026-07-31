@@ -67,6 +67,20 @@ export function RecipeForm({ recipe }: { recipe?: RecipeWithIngredients }) {
             placeholder="Quick and comforting"
           />
         </div>
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Label htmlFor="image_url">Cover image URL</Label>
+          <Input
+            id="image_url"
+            name="image_url"
+            type="url"
+            defaultValue={recipe?.image_url ?? ""}
+            placeholder="https://…"
+          />
+          <p className="text-xs text-zinc-500">
+            Optional. Shown in the cookbook when you share the recipe. Must start
+            with http:// or https://.
+          </p>
+        </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="servings">Servings</Label>
           <Input
