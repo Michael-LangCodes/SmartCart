@@ -134,6 +134,18 @@ export type KitchenPerson = {
   created_at: string;
 };
 
+/** Shared pantry inventory item for a kitchen. */
+export type KitchenPantryItem = {
+  id: string;
+  kitchen_id: string;
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type KitchenPersonFavorite = {
   person_id: string;
   recipe_id: string;

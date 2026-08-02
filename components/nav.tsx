@@ -11,6 +11,7 @@ import {
   UserRound,
   LogOut,
   LogIn,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setActiveKitchen } from "@/app/(app)/actions";
@@ -20,6 +21,7 @@ import type { Kitchen } from "@/lib/types";
 const LINKS = [
   { href: "/planner", label: "Planner", icon: CalendarDays },
   { href: "/grocery", label: "Grocery", icon: ShoppingCart },
+  { href: "/pantry", label: "Pantry", icon: Package },
   { href: "/recipes", label: "My Recipes", icon: BookOpen },
   { href: "/cookbook", label: "Cookbook", icon: BookMarked },
   { href: "/kitchens", label: "Kitchens", icon: Users },

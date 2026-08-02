@@ -9,6 +9,7 @@ const PROTECTED_PREFIXES = [
   "/kitchens",
   "/planner",
   "/grocery",
+  "/pantry",
   "/profile",
 ];
 
