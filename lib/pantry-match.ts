@@ -50,13 +50,23 @@ export type RecipePantryMatch = {
   matchCount: number;
   /** 0–1 coverage of unique ingredient names. */
   score: number;
+  /** Fewer missing ingredients = closer match (used for sorting). */
+  missingCount: number;
   ready: boolean;
+  favorite: boolean;
+  /** 1–3 profile rank when applicable; lower is higher priority. */
+  favoriteRank: number | null;
 };
 
-/** Score recipes against a pantry name list (quantity not considered). */
+/**
+ * Score recipes against a pantry name list (quantity not considered).
+ * Sorted by closest match (highest coverage, fewest missing), with favorites
+ * ranked ahead of non-favorites when scores tie.
+ */
 export function matchRecipesToPantry(
   recipes: PantryMatchRecipe[],
   pantryNames: string[],
+  favoriteById: Map<string, number> = new Map(),
 ): RecipePantryMatch[] {
   const pantry = pantryNames.map(normalizeIngredientName).filter(Boolean);
   if (pantry.length === 0) return [];
@@ -83,6 +93,7 @@ export function matchRecipesToPantry(
     const total = unique.size;
     const matchCount = matched.length;
     const score = matchCount / total;
+    const favoriteRank = favoriteById.get(recipe.id) ?? null;
     results.push({
       recipe,
       matched,
@@ -90,14 +101,26 @@ export function matchRecipesToPantry(
       total,
       matchCount,
       score,
+      missingCount: missing.length,
       ready: missing.length === 0,
+      favorite: favoriteRank != null,
+      favoriteRank,
     });
   }
 
   results.sort((a, b) => {
-    if (a.ready !== b.ready) return a.ready ? -1 : 1;
+    // Closest match first: higher coverage, then fewer missing ingredients.
     if (b.score !== a.score) return b.score - a.score;
+    if (a.missingCount !== b.missingCount) {
+      return a.missingCount - b.missingCount;
+    }
     if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+    // Favorites before non-favorites on a tie; better rank (1) first.
+    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
+    if (a.favoriteRank != null && b.favoriteRank != null) {
+      return a.favoriteRank - b.favoriteRank;
+    }
+    if (a.ready !== b.ready) return a.ready ? -1 : 1;
     return a.recipe.title.localeCompare(b.recipe.title);
   });
 

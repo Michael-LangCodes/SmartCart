@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Trash2, CookingPot, ExternalLink } from "lucide-react";
+import { Plus, Trash2, CookingPot, ExternalLink, Star } from "lucide-react";
 import {
   addPantryItem,
   clearPantry,
@@ -19,28 +19,33 @@ import {
 } from "@/lib/pantry-match";
 import type { KitchenPantryItem } from "@/lib/types";
 
-type FilterMode = "any" | "half" | "ready";
+type FilterMode = "any" | "half" | "ready" | "favorites";
 
 export function PantryPageClient({
   items,
   recipes,
   currentUserId,
+  favoriteById,
 }: {
   items: KitchenPantryItem[];
   recipes: PantryMatchRecipe[];
   currentUserId: string;
+  favoriteById: Record<string, number>;
 }) {
   const [filter, setFilter] = useState<FilterMode>("any");
 
   const matches = useMemo(() => {
+    const favMap = new Map(Object.entries(favoriteById).map(([k, v]) => [k, v]));
     const all = matchRecipesToPantry(
       recipes,
       items.map((i) => i.name),
+      favMap,
     );
     if (filter === "ready") return all.filter((m) => m.ready);
     if (filter === "half") return all.filter((m) => m.score >= 0.5);
+    if (filter === "favorites") return all.filter((m) => m.favorite);
     return all.filter((m) => m.matchCount > 0);
-  }, [recipes, items, filter]);
+  }, [recipes, items, filter, favoriteById]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr]">
@@ -148,7 +153,8 @@ export function PantryPageClient({
               Recipe matches
             </h2>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              From your recipes and the public cookbook.
+              Sorted by closest match. Favorites from your profile and household
+              are highlighted.
             </p>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -157,6 +163,7 @@ export function PantryPageClient({
                 ["any", "Any match"],
                 ["half", "≥ 50%"],
                 ["ready", "Ready to cook"],
+                ["favorites", "Favorites"],
               ] as const
             ).map(([value, label]) => (
               <button
@@ -198,7 +205,11 @@ export function PantryPageClient({
               return (
                 <li
                   key={m.recipe.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+                  className={
+                    m.favorite
+                      ? "overflow-hidden rounded-xl border border-amber-300 bg-amber-50/40 ring-1 ring-amber-200/80 dark:border-amber-800 dark:bg-amber-950/25 dark:ring-amber-900/50"
+                      : "overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+                  }
                 >
                   <div className="flex flex-col sm:flex-row">
                     <div className="relative w-full shrink-0 sm:w-40">
@@ -208,16 +219,33 @@ export function PantryPageClient({
                         variant="card"
                         className="rounded-none sm:h-full sm:min-h-[140px]"
                       />
+                      {m.favorite && (
+                        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-950 shadow-sm">
+                          <Star className="h-3 w-3 fill-current" />
+                          Favorite
+                          {m.favoriteRank != null && m.favoriteRank <= 3
+                            ? ` #${m.favoriteRank}`
+                            : ""}
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-1 flex-col gap-2 p-4">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
-                          <Link
-                            href={href}
-                            className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
-                          >
-                            {m.recipe.title}
-                          </Link>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Link
+                              href={href}
+                              className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
+                            >
+                              {m.recipe.title}
+                            </Link>
+                            {m.favorite && (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-800 dark:text-amber-300 sm:hidden">
+                                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                                Favorite
+                              </span>
+                            )}
+                          </div>
                           {m.ready ? (
                             <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
                               <CookingPot className="h-3.5 w-3.5" />
@@ -226,11 +254,21 @@ export function PantryPageClient({
                           ) : (
                             <p className="mt-0.5 text-xs text-zinc-500">
                               {m.matchCount} of {m.total} ingredients on hand
+                              {m.missingCount > 0
+                                ? ` · ${m.missingCount} missing`
+                                : ""}
                             </p>
                           )}
                         </div>
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                          {pct}%
+                        <span
+                          className={
+                            m.favorite
+                              ? "rounded-full bg-amber-200/80 px-2 py-0.5 text-xs font-medium tabular-nums text-amber-950 dark:bg-amber-900/60 dark:text-amber-100"
+                              : "rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                          }
+                          title="Match coverage"
+                        >
+                          {pct}% match
                         </span>
                       </div>
 
